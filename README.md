@@ -10,6 +10,11 @@ This tool is designed for astrologers who want deep planetary significator analy
 
 ---
 
+# LIVE LINK
+
+https://donniedarsshan.github.io/Nakshatra-Nadi/
+
+
 # Features
 
 ## Nadi Significator Finder
