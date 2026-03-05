@@ -10,7 +10,7 @@ This tool is designed for astrologers who want deep planetary significator analy
 
 ---
 
-# LIVE LINK
+# Live Link
 
 https://donniedarsshan.github.io/Nakshatra-Nadi/
 
