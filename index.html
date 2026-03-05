@@ -796,6 +796,9 @@ Vimshottari Dasha ▼
 let DATA=null;
 let CUSPS=[];
 let PLANETS={};
+let UNTENANTED_CACHE={};
+let UNTENANTED_IGNORE=true;   // 🔥 ADD THIS
+
 
 
 /* ======================================================
@@ -931,10 +934,21 @@ document.getElementById("jsonLoader").onchange=e=>{
   const r=new FileReader();
 
   r.onload=()=>{
-    DATA=JSON.parse(r.result);
-    parseSwiss();
-    buildAll();
-  };
+  DATA=JSON.parse(r.result);
+  parseSwiss();
+
+  /* ======================================
+     AUTO SET PLANET ORDER = CHANDRA STAR
+  ====================================== */
+
+  const chandraStar = starLord(PLANETS["Chandra"]);
+
+  if(chandraStar){
+    planetOrderSel.value = chandraStar;
+  }
+
+  buildAll();
+};
 
   r.readAsText(f);
 };
@@ -1179,24 +1193,32 @@ function rotateHouse(h){
 
 function getUntenantedPlanets(){
 
-  const houseCount={};
+  const starOccupied = {};
 
+  /* check star lord of every planet */
   Object.keys(PLANETS).forEach(p=>{
 
-    const h=rotateHouse(rawHouseOf(PLANETS[p]));
+    const abs = PLANETS[p];
+    if(abs === undefined) return;
 
-    if(!houseCount[h]) houseCount[h]=[];
-    houseCount[h].push(p);
+    const star = starLord(abs);
+
+    starOccupied[star] = true;
 
   });
 
-  const result={};
+  const result = {};
 
-  Object.keys(houseCount).forEach(h=>{
-    if(houseCount[h].length===1){
-      result[houseCount[h][0]] = true;
+  /* if a planet never appears as star lord → untenanted */
+  Object.keys(PLANETS).forEach(p=>{
+
+    if(!starOccupied[p]){
+      result[p] = true;
     }
+
   });
+
+  UNTENANTED_CACHE = result;
 
   return result;
 }
@@ -1615,7 +1637,7 @@ header2.onclick=()=>{
     }
   });
 
-  const untenanted={};
+  const untenanted = getUntenantedPlanets();
 
   corePlanets.forEach(p=>{
     if(!starLordSet.has(p)){
@@ -2014,6 +2036,37 @@ nodeCuspLabel.appendChild(
   document.createTextNode("RAHU/KETU CUSPAL")
 );
 
+
+
+/* ===== UNTENANTED IGNORE ===== */
+
+
+
+const untenLabel=document.createElement("label");
+untenLabel.style.display="flex";
+untenLabel.style.alignItems="center";
+untenLabel.style.gap="8px";
+untenLabel.style.cursor="pointer";
+
+const untenCheckbox=document.createElement("input");
+untenCheckbox.type="checkbox";
+untenCheckbox.id="untenantedIgnoreToggle";
+untenCheckbox.checked = UNTENANTED_IGNORE;   // 🔥 default ON
+untenCheckbox.style.width="18px";
+untenCheckbox.style.height="18px";
+
+untenLabel.appendChild(untenCheckbox);
+untenLabel.appendChild(document.createTextNode("UNTENANTED"));
+
+toggleWrap.appendChild(untenLabel);
+
+untenCheckbox.onchange=()=>{
+
+  UNTENANTED_IGNORE = untenCheckbox.checked;
+
+  if(DATA) buildAll();
+};
+
 toggleWrap.appendChild(nodeCuspLabel);
 
 
@@ -2088,9 +2141,21 @@ function effectiveLinks(plA,plB){
   /* ================================
      MERGE HOUSE LISTS
   ================================= */
+  
+  
+  /* =================================
+   UNTENANTED IGNORE RULE
+================================= */
 
-  const listA = getListFromHouseString(plA);
-  const listB = getListFromHouseString(plB);
+if(UNTENANTED_IGNORE){
+
+  if(UNTENANTED_CACHE[plA]) plB=null;
+  if(UNTENANTED_CACHE[plB]) plA=null;
+
+}
+
+  const listA = plA ? getListFromHouseString(plA) : [];
+  const listB = plB ? getListFromHouseString(plB) : [];
 
   let merged = [...listA, ...listB];
   merged.sort((a,b)=>a-b);
@@ -2265,8 +2330,11 @@ Object.keys(counts)
     const starOfSSL=starLord(PLANETS[ssl]);
 
     function format(pl){
-      return pl+" "+houseString(pl);
-    }
+
+	  const u = UNTENANTED_CACHE[pl] ? "$ " : "";
+
+	  return u + pl + " " + houseString(pl);
+	}
 
     /* 🔥 EFFECTIVE LINKS */
     const effA = effectiveLinks(p,star);
@@ -2371,6 +2439,12 @@ document.body.appendChild(wrap);
 
 
 
+
+
+
+
+
+
 /* ======================================================
    BUILD LORDSHIP GOOD OR BAD DECEIDER
    ASC ORDER (1 → 12 LORDS)
@@ -2425,12 +2499,39 @@ function buildLordshipDecider(wrap){
      TITLE
   ============================== */
 
-  const title=document.createElement("h2");
-  title.textContent =
-    "LORDSHIP GOOD OR BAD DECEIDER : " + baseSignName.toUpperCase();
+  const titleRow=document.createElement("div");
+titleRow.style.display="flex";
+titleRow.style.alignItems="center";
+titleRow.style.gap="20px";
+titleRow.style.marginTop="40px";
 
-  title.style.marginTop="40px";
-  wrap.appendChild(title);
+const title=document.createElement("h2");
+title.textContent =
+  "LORDSHIP GOOD OR BAD DECEIDER : " + baseSignName.toUpperCase();
+
+title.style.margin="0";
+
+titleRow.appendChild(title);
+
+/* ===== DBA SORT TOGGLE ===== */
+
+const dbaLabel=document.createElement("label");
+dbaLabel.style.display="flex";
+dbaLabel.style.alignItems="center";
+dbaLabel.style.gap="8px";
+dbaLabel.style.fontWeight="900";
+dbaLabel.style.cursor="pointer";
+
+const dbaCheckbox=document.createElement("input");
+dbaCheckbox.type="checkbox";
+dbaCheckbox.id="lordshipDBASort";
+
+dbaLabel.appendChild(dbaCheckbox);
+dbaLabel.appendChild(document.createTextNode("DBA Sort"));
+
+titleRow.appendChild(dbaLabel);
+
+wrap.appendChild(titleRow);
 
   /* ==============================
      TABLE
@@ -2472,6 +2573,8 @@ function buildLordshipDecider(wrap){
    BUILD 12 LORD ROWS
 ============================== */
 
+let rows=[];
+
 for(let lordHouse=1; lordHouse<=12; lordHouse++){
 
   const planet = houseLord(lordHouse);
@@ -2489,89 +2592,242 @@ for(let lordHouse=1; lordHouse<=12; lordHouse++){
   else if(rule.bad.includes(placedHouse)) result="Bad";
   else if(rule.worst.includes(placedHouse)) result="Worst";
 
-  const tr=document.createElement("tr");
+  rows.push({
+    planet,
+    lordHouse,
+    placedHouse,
+    result
+  });
+  
+  
+ }
+  
+  
+  
+  
+  
+  
+/* ==============================
+   ADD RAHU & KETU ROWS
+============================== */
 
-  tr.innerHTML=
-    "<td>"+planet+"</td>"+
-    "<td>"+lordHouse+"</td>"+
-    "<td>"+placedHouse+"</td>"+
-    "<td>"+result+"</td>";
-
-  table.appendChild(tr);
-}
-
-/* =====================================================
-   ADD RAHU & KETU LORDSHIP ROWS (DISPOSITOR BASED)
-===================================================== */
-
-function addNodeLordRows(nodeName){
+["Rahu","Ketu"].forEach(nodeName=>{
 
   const abs = PLANETS[nodeName];
   if(abs===undefined) return;
 
-  /* placement house still used for result evaluation */
   const placedHouse = rotateHouse(rawHouseOf(abs));
-
-  /* =====================================
-     TRUE ZODIAC SIGN OF NODE
-     NEVER SHIFTED
-     NEVER KP
-     NEVER PIVOT
-  ===================================== */
 
   const signIndex = Math.floor(abs / 30);
   const signName  = SIGNS[signIndex];
   const dispositor = SIGN_LORDS[signName];
 
-  /* find which houses dispositor owns from pivot base */
-  const ownedHouses = [];
+  let found=false;
 
   for(let h=1; h<=12; h++){
+
     if(houseLord(h) === dispositor){
-      ownedHouses.push(h);
+
+      const rule = LORDSHIP_MATRIX[h];
+
+      let result="";
+
+      if(rule.excellent.includes(placedHouse)) result="Excellent";
+      else if(rule.good.includes(placedHouse)) result="Good";
+      else if(rule.average.includes(placedHouse)) result="Average";
+      else if(rule.bad.includes(placedHouse)) result="Bad";
+      else if(rule.worst.includes(placedHouse)) result="Worst";
+
+      const lordSignIndex = (baseSignIndex + (h-1)) % 12;
+      const lordSignName = SIGNS[lordSignIndex];
+
+      rows.push({
+        planet: nodeName+" ("+lordSignName.slice(0,3)+")",
+        lordHouse: h,
+        placedHouse,
+        result
+      });
+
+      found=true;
     }
+
   }
 
-  /* build rows */
-  ownedHouses.forEach(lordHouse=>{
+  /* 🔥 guarantee row exists */
+  if(!found){
+    rows.push({
+      planet: nodeName,
+      lordHouse: "-",
+      placedHouse,
+      result: "-"
+    });
+  }
 
-    const rule = LORDSHIP_MATRIX[lordHouse];
+});
+ 
+  
+  
+  
 
-    let result="";
 
-    if(rule.excellent.includes(placedHouse)) result="Excellent";
-    else if(rule.good.includes(placedHouse)) result="Good";
-    else if(rule.average.includes(placedHouse)) result="Average";
-    else if(rule.bad.includes(placedHouse)) result="Bad";
-    else if(rule.worst.includes(placedHouse)) result="Worst";
+/* ===== DBA SORT FUNCTION ===== */
 
-    const lordSignIndex = (baseSignIndex + (lordHouse-1)) % 12;
-    const lordSignName = SIGNS[lordSignIndex];
+/* ===== DBA SORT FUNCTION ===== */
+
+function renderRows(){
+
+  /* clear old rows */
+  table.querySelectorAll("tr:not(:first-child)").forEach(r=>r.remove());
+
+  let renderList=[...rows];
+
+  const dbaSort=document.getElementById("lordshipDBASort")?.checked;
+
+
+
+
+
+
+
+
+
+
+
+
+if(dbaSort){
+
+  /* ==========================================
+     CHANDRA STAR LORD
+  ========================================== */
+
+  const chandraStar = starLord(PLANETS["Chandra"]);
+
+  /* 🔥 FORCE PLANET ORDER DROPDOWN */
+  if(chandraStar && planetOrderSel.value !== chandraStar){
+    planetOrderSel.value = chandraStar;
+  }
+
+  const order = rotatedDBA(chandraStar);
+
+  const fullOrder=[...order];
+
+  if(!fullOrder.includes("Rahu")) fullOrder.push("Rahu");
+  if(!fullOrder.includes("Ketu")) fullOrder.push("Ketu");
+
+  renderList.sort((a,b)=>{
+
+    const pa=a.planet.split(" ")[0];
+    const pb=b.planet.split(" ")[0];
+
+    const ia = fullOrder.indexOf(pa);
+    const ib = fullOrder.indexOf(pb);
+
+    if(ia===-1 && ib===-1) return 0;
+    if(ia===-1) return 1;
+    if(ib===-1) return -1;
+
+    return ia-ib;
+
+  });
+
+}
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  /* render rows */
+  renderList.forEach(r=>{
 
     const tr=document.createElement("tr");
 
     tr.innerHTML=
-      "<td>"+nodeName+" ("+lordSignName.slice(0,3)+")</td>"+
-      "<td>"+lordHouse+"</td>"+
-      "<td>"+placedHouse+"</td>"+
-      "<td>"+result+"</td>";
+      "<td>"+(UNTENANTED_CACHE[r.planet.split(" ")[0]] ? "$ " : "")+r.planet+"</td>"+
+      "<td>"+r.lordHouse+"</td>"+
+      "<td>"+r.placedHouse+"</td>"+
+      "<td>"+r.result+"</td>";
 
     table.appendChild(tr);
 
   });
+
 }
 
-/* add Rahu rows */
-addNodeLordRows("Rahu");
+/* initial render */
+renderRows();
 
-/* add Ketu rows */
-addNodeLordRows("Ketu");
 
-/* 🔥 VERY IMPORTANT — APPEND TABLE */
+
+
+
+setTimeout(()=>{
+
+  const cb=document.getElementById("lordshipDBASort");
+
+  if(cb){
+
+
+
+
+
+    cb.onchange=()=>{
+
+	  if(cb.checked){
+
+		const chandraStar = starLord(PLANETS["Chandra"]);
+
+		if(chandraStar){
+
+		  /* change dropdown only */
+		  planetOrderSel.value = chandraStar;
+
+		  /* 🔥 ONLY SORT — DO NOT REBUILD */
+		  renderRows();
+		}
+
+	  }else{
+
+		/* back to normal order */
+		renderRows();
+	  }
+
+	};
+
+
+
+
+
+  }
+
+},0);
+
+/* append table to wrapper */
 wrap.appendChild(table);
 
-
 }
+
+
+
+
+
+
+
+
+
+
+
+/* ======================================================
+   NODE TOGGLE
+====================================================== */
+
+
+
+
 
 
 
@@ -2811,8 +3067,14 @@ function getNadiEffFromTable(planet){
   if(!table) return {A:"",B:"",C:""};
 
   for(const r of table.querySelectorAll("tr")){
-    const t=r.children[0]?.textContent || "";
+
+    let t=r.children[0]?.textContent || "";
+
+    /* remove $ marker for untenanted planets */
+    t = t.replace("$ ","").trim();
+
     if(t.startsWith(planet+" ")){
+
       return{
         A:r.children[6]?.textContent || "",
         B:r.children[7]?.textContent || "",
@@ -2820,6 +3082,7 @@ function getNadiEffFromTable(planet){
       };
     }
   }
+
   return {A:"",B:"",C:""};
 }
 
@@ -3210,4 +3473,5 @@ document.getElementById("vimHideDate").onchange = function(){
 </script>
 
 </body>
+</html>
 </html>
