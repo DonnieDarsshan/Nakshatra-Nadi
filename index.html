@@ -894,7 +894,7 @@ Ketu:7,Venus:20,Surya:6,Chandra:10,
 Mangala:7,Rahu:18,Jupiter:16,Saturn:19,Budha:17
 };
 
-const STAR_LEN=13+20/60;
+const STAR_LEN = 360/27;
 
 
 const DBA_SEQUENCE=[
@@ -2427,8 +2427,22 @@ wrap.addEventListener("keydown",(e)=>{
  
  
  
-  buildLordshipDecider(wrap);
+  /* append main NADI table */
 document.body.appendChild(wrap);
+
+/* ======================================
+   MOVE VIMSHOTTARI AFTER NADI TABLE
+====================================== */
+
+const vimBox = document.getElementById("vimshottari-wrapper");
+
+if(vimBox){
+  wrap.appendChild(vimBox);
+}
+
+/* now build lordship below Vimshottari */
+buildLordshipDecider(wrap);
+
 }
 
 
