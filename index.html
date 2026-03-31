@@ -681,9 +681,10 @@ PLANET ORDER :
 <div class="controlRow">
 
   TEMPLATE :
-  <select id="templateSelect" style="width:240px; font-weight:900;">
+<select id="templateSelect" style="width:240px; font-weight:900;">
     <option value="manual" selected>Manual Entry</option>
-    <option value="career">Career & Business</option>
+    <option value="even_odd">Even-Odd</option> 
+	<option value="career">Career & Business</option>
     <option value="marriage">Marriage</option>
     <option value="child">Child Birth</option>
     <option value="long_char">Longevity Chara Lagna</option>
@@ -693,6 +694,7 @@ PLANET ORDER :
     <option value="education">Education</option>
     <option value="court">Court Cases</option>
     <option value="travel">Travel Abroad</option>
+    
   </select>
 
   
@@ -808,6 +810,7 @@ let UNTENANTED_IGNORE=false;   // 🔥 ADD THIS
 let IGNORE_CUSPAL = false;
 let SHIFTED_LORDSHIP = true;   // 🔥 GLOBAL ENGINE FLAG
 let NODE_CUSPAL_ENABLED = false;
+let DBA_SORT_STATE = true;
 
 /* ==============================
    UI STATE MEMORY
@@ -2555,7 +2558,7 @@ dbaLabel.style.cursor="pointer";
 const dbaCheckbox=document.createElement("input");
 dbaCheckbox.type="checkbox";
 dbaCheckbox.id="lordshipDBASort";
-dbaCheckbox.checked=true;
+dbaCheckbox.checked=DBA_SORT_STATE;
 
 dbaLabel.appendChild(dbaCheckbox);
 dbaLabel.appendChild(document.createTextNode("DBA Sort"));
@@ -2728,19 +2731,13 @@ function renderRows(){
 if(dbaSort){
 
   /* ==========================================
-     CHANDRA STAR LORD
+     USE CURRENT DROPDOWN FOR SORTING
   ========================================== */
-
-  const chandraStar = starLord(PLANETS["Chandra"]);
-
-  /* 🔥 FORCE PLANET ORDER DROPDOWN */
-  if(chandraStar && planetOrderSel.value !== chandraStar){
-    planetOrderSel.value = chandraStar;
-  }
-
-  const order = rotatedDBA(chandraStar);
+  const order = rotatedDBA(planetOrderSel.value);
 
   const fullOrder=[...order];
+  
+  
 
   if(!fullOrder.includes("Rahu")) fullOrder.push("Rahu");
   if(!fullOrder.includes("Ketu")) fullOrder.push("Ketu");
@@ -2808,6 +2805,8 @@ setTimeout(()=>{
 
 
     cb.onchange=()=>{
+      
+      DBA_SORT_STATE = cb.checked;
 
 	  if(cb.checked){
 
@@ -2946,11 +2945,17 @@ const templateSelect=document.getElementById("templateSelect");
 const TEMPLATES = {
 
   manual:{pos:"",support:"",neg:""},
+  
+  even_odd:{
+    pos:"2,4,6,10",
+    support:"8,12",
+    neg:"1,3,5,7,9,11"
+  },
 
   career:{
   pos:"6,10,11",
   support:"2,4,7",
-  neg:"1,3,5,8,9,12"
+  neg:"1,5,8,9,12"
 },
 
   marriage:{
@@ -3002,7 +3007,7 @@ const TEMPLATES = {
   },
 
   court:{
-    pos:"3,9,10,11",
+    pos:"9,10,11",
     support:"",
     neg:"1,3,6,8,12"
   },
