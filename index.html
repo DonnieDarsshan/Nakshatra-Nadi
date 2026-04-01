@@ -799,7 +799,7 @@ let DATA=null;
 let CUSPS=[];
 let PLANETS={};
 let UNTENANTED_CACHE={};
-let UNTENANTED_IGNORE=false;   // 🔥 ADD THIS
+let UNTENANTED_IGNORE=true;   // 🔥 ON by default
 
 
 
@@ -808,7 +808,7 @@ let UNTENANTED_IGNORE=false;   // 🔥 ADD THIS
 ====================================================== */
 
 let IGNORE_CUSPAL = false;
-let SHIFTED_LORDSHIP = true;   // 🔥 GLOBAL ENGINE FLAG
+let SHIFTED_LORDSHIP = false;  // 🔥 OFF by default
 let NODE_CUSPAL_ENABLED = false;
 let DBA_SORT_STATE = true;
 
@@ -925,8 +925,15 @@ function rotatedDBA(start){
   return [...DBA_SEQUENCE.slice(i),...DBA_SEQUENCE.slice(0,i)];
 }
 
+
+
+
+
+
+
+
 /* ======================================================
-   FILE LOAD
+   FILE LOAD & RESET UI
 ====================================================== */
 
 document.getElementById("jsonLoader").onchange=e=>{
@@ -937,24 +944,80 @@ document.getElementById("jsonLoader").onchange=e=>{
   const r=new FileReader();
 
   r.onload=()=>{
-  DATA=JSON.parse(r.result);
-  parseSwiss();
+    DATA=JSON.parse(r.result);
+    parseSwiss();
 
-  /* ======================================
-     AUTO SET PLANET ORDER = CHANDRA STAR
-  ====================================== */
+    /* ======================================
+       1. RESET STATIC UI ELEMENTS
+    ====================================== */
+    document.getElementById("kpMode").checked = true;
+    document.getElementById("signMode").checked = false;
+    document.getElementById("meanNode").checked = true;
+    document.getElementById("trueNode").checked = false;
+    document.getElementById("compressRows").checked = true;
+    document.getElementById("aspectToggle").checked = false;
+    document.getElementById("dispositorToggle").checked = false;
+    
+    if(document.getElementById("vimHideDate")) document.getElementById("vimHideDate").checked = true;
+    if(document.getElementById("vimShiftAmount")) document.getElementById("vimShiftAmount").selectedIndex = 0;
 
-  const chandraStar = starLord(PLANETS["Chandra"]);
+    document.getElementById("pivotSelect").selectedIndex = 0; 
+    document.getElementById("templateSelect").value = "manual";
+    
+    document.getElementById("finderInputPos").value = "";
+    document.getElementById("finderInputSupport").value = "";
+    document.getElementById("finderInputNeg").value = "";
 
-  if(chandraStar){
-    planetOrderSel.value = chandraStar;
-  }
+    /* ======================================
+       2. RESET DYNAMIC DOM CHECKBOXES
+       (Must happen before buildAll reads them)
+    ====================================== */
+    if(document.getElementById("shiftedLordshipToggle")) {
+      document.getElementById("shiftedLordshipToggle").checked = false; // Force DOM OFF
+    }
+    if(document.getElementById("untenantedIgnoreToggle")) {
+      document.getElementById("untenantedIgnoreToggle").checked = true; // Force DOM ON
+    }
+    if(document.getElementById("ignoreCuspalToggle")) {
+      document.getElementById("ignoreCuspalToggle").checked = false; 
+    }
+    if(document.getElementById("nodeCuspalToggle")) {
+      document.getElementById("nodeCuspalToggle").checked = false;
+    }
+    if(document.getElementById("sslToggle")) {
+      document.getElementById("sslToggle").checked = true; 
+    }
 
-  buildAll();
-};
+    /* ======================================
+       3. RESET GLOBAL ENGINE FLAGS
+    ====================================== */
+    IGNORE_CUSPAL = false;
+    SHIFTED_LORDSHIP = false; // Engine OFF
+    UNTENANTED_IGNORE = true; // Engine ON
+    NODE_CUSPAL_ENABLED = false;
+    DBA_SORT_STATE = true;
+    VIM_VISUAL_OFFSET = 0;
+
+    /* ======================================
+       AUTO SET PLANET ORDER = CHANDRA STAR
+    ====================================== */
+    const chandraStar = starLord(PLANETS["Chandra"]);
+
+    if(chandraStar){
+      planetOrderSel.value = chandraStar;
+    }
+
+    buildAll();
+  };
 
   r.readAsText(f);
 };
+
+
+
+
+
+
 
 
 
@@ -1915,14 +1978,17 @@ function buildNadiIntegratedTable(){
   /* ===============================
      PRESERVE OLD TOGGLE STATE
   =============================== */
-    const prevIgnoreCuspal =
-    document.getElementById("ignoreCuspalToggle")?.checked || false;
+  const prevIgnoreCuspal =
+    document.getElementById("ignoreCuspalToggle")?.checked ?? false;
 
   const prevHideSSL =
     document.getElementById("sslToggle")?.checked ?? true;
 
   const prevShiftedLordship =
-  document.getElementById("shiftedLordshipToggle")?.checked ?? true;
+    document.getElementById("shiftedLordshipToggle")?.checked ?? false; // 🔥 Fixed: Falls back to OFF if no chart is loaded yet
+
+  const prevUntenanted = 
+    document.getElementById("untenantedIgnoreToggle")?.checked ?? true; // 🔥 Added fallback for Untenanted
 	
 	
 
@@ -2065,7 +2131,7 @@ untenLabel.style.cursor="pointer";
 const untenCheckbox=document.createElement("input");
 untenCheckbox.type="checkbox";
 untenCheckbox.id="untenantedIgnoreToggle";
-untenCheckbox.checked = UNTENANTED_IGNORE;   // 🔥 default ON
+untenCheckbox.checked = prevUntenanted;   // 🔥 Uses our new ON fallback
 untenCheckbox.style.width="18px";
 untenCheckbox.style.height="18px";
 
