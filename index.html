@@ -684,18 +684,25 @@ PLANET ORDER :
 <select id="templateSelect" style="width:240px; font-weight:900;">
     <option value="manual" selected>Manual Entry</option>
     <option value="even_odd">Even-Odd</option> 
-	<option value="career">Career & Business</option>
+    <option value="career">Career & Business</option>
+    <option value="income">Income</option>
     <option value="marriage">Marriage</option>
+    <option value="love_marriage">Love Marriage</option>
+    <option value="love_affair">Love Affair Only</option>
+    <option value="no_marriage">No Marriage</option>
     <option value="child">Child Birth</option>
+    <option value="property">Property & Vehicle Purchase</option>
+    <option value="education">Education</option>
+    <option value="film_success">Film Land Success</option>
+    <option value="court">Court Cases</option>
+    <option value="travel">Travel Abroad</option>
+    <option value="health">Health</option>
+    <option value="long_life">Long Life</option>
+    <option value="short_life">Short Life</option>
     <option value="long_char">Longevity Chara Lagna</option>
     <option value="long_sthira">Longevity Sthira Lagna</option>
     <option value="long_dwi">Longevity Dwiswabhava Lagna</option>
-    <option value="property">Property & Vehicle Purchase</option>
-    <option value="education">Education</option>
-    <option value="court">Court Cases</option>
-    <option value="travel">Travel Abroad</option>
-    
-  </select>
+</select>
 
   
 
@@ -817,8 +824,8 @@ let DBA_SORT_STATE = true;
 ============================== */
 
 let UI_STATE = {
-  ninePlanetsExpanded:false,
-  compressedExpanded:false
+  ninePlanetsExpanded: false,
+  compressedExpanded: false
 };
 
 /* ======================================================
@@ -2196,7 +2203,8 @@ wrap.appendChild(toggleWrap);
   }
 
   function getCuspal(pl){
-  return cuspConj(pl,PLANETS[pl]) || [];
+    if(!pl) return []; // Protect against undefined planets
+    return cuspConj(pl,PLANETS[pl]) || [];
 }
   
   
@@ -2410,6 +2418,7 @@ Object.keys(counts)
     const starOfSSL=starLord(PLANETS[ssl]);
 
     function format(pl){
+      if(!pl) return "---"; // Protect against undefined planets
 
 	  const u = UNTENANTED_CACHE[pl] ? "$ " : "";
 
@@ -3009,83 +3018,122 @@ const templateSelect=document.getElementById("templateSelect");
 ================================= */
 
 const TEMPLATES = {
-
-  manual:{pos:"",support:"",neg:""},
+  manual: { pos: "", support: "", neg: "" },
   
-  even_odd:{
-    pos:"2,4,6,10",
-    support:"8,12",
-    neg:"1,3,5,7,9,11"
+  even_odd: {
+    pos: "2,4,6,10",
+    support: "8,12",
+    neg: "1,3,5,7,9,11"
   },
 
-  career:{
-  pos:"6,10,11",
-  support:"2,4,7",
-  neg:"1,5,8,9,12"
-},
-
-  marriage:{
-    pos:"2,7,11",
-    support:"3,5,9",
-    neg:"1,4,6,8,10,12"
+  career: {
+    pos: "6,10,11",
+    support: "2,4,7",
+    neg: "1,3,5,6,8,9,12"
   },
 
-  love:{
-    pos:"5,7,11",
-    support:"7",
-    neg:"1,4,6,8,12"
+  income: {
+    pos: "2,6,10,11",
+    support: "1,7",
+    neg: "5,8,9,12"
   },
 
-  child:{
-    pos:"2,5,11",
-    support:"3,7,9",
-    neg:"1,4,8,10,12"
+  marriage: {
+    pos: "2,7,11",
+    support: "3,5,9",
+    neg: "1,4,6,8,10,12"
   },
 
-  long_char:{
-    pos:"1,3,5,9",
-    support:"",
-    neg:"2,7,4,6,8,11,12"
+  love_marriage: {
+    pos: "2,5,7,11",
+    support: "7",
+    neg: "1,4,6,8,12"
   },
 
-  long_sthira:{
-    pos:"1,3,5,11",
-    support:"9",
-    neg:"2,7,4,6,8,12"
+  love_affair: {
+    pos: "5,8,12",
+    support: "",
+    neg: "4,5,6,8,10,12"
   },
 
-  long_dwi:{
-    pos:"1,3,5,11",
-    support:"9",
-    neg:"2,7,4,6,8,12"
+  no_marriage: {
+    pos: "6,8,12",
+    support: "1,4,10",
+    neg: "5"
   },
 
-  property:{
-    pos:"4,11,12",
-    support:"6,8",
-    neg:"3,5,10"
+  child: {
+    pos: "2,5,11",
+    support: "3,7,9",
+    neg: "1,4,6,8,10,12"
   },
 
-  education:{
-    pos:"4,5,9,10,11",
-    support:"1,2,7",
-    neg:"3,6,8,12"
+  property: {
+    pos: "4,11,12",
+    support: "6,8",
+    neg: "3,4,5,10"
   },
 
-  court:{
-    pos:"9,10,11",
-    support:"",
-    neg:"1,3,6,8,12"
+  education: {
+    pos: "4,5,9,11",
+    support: "1,2,7,10",
+    neg: "3,6,8,12"
   },
 
-  travel:{
-    pos:"3,9,12",
-    support:"7",
-    neg:"2,4,11"
+  film_success: {
+    pos: "5,6,7,10,11",
+    support: "",
+    neg: "8,12"
+  },
+
+  court: {
+    pos: "6,10,11",
+    support: "",
+    neg: "1,3,6,8,12"
+  },
+
+  travel: {
+    pos: "3,9,12",
+    support: "7",
+    neg: "2,4,8,11"
+  },
+
+  health: {
+    pos: "1,5,11",
+    support: "3",
+    neg: "4,6,8,12"
+  },
+
+  long_life: {
+    pos: "1,3,5,8,10",
+    support: "",
+    neg: "2,6,7,9,11,12"
+  },
+
+  short_life: {
+    pos: "2,6,7,9,11,12",
+    support: "",
+    neg: "1,3,5,8,10"
+  },
+
+  long_char: {
+    pos: "1,3,5,8,9",
+    support: "",
+    neg: "2,6,7,8,11,12"
+  },
+
+  long_sthira: {
+    pos: "1,3,5,8,11",
+    support: "9",
+    neg: "2,4,6,7,8,12"
+  },
+
+  long_dwi: {
+    pos: "1,3,5,8,11",
+    support: "9",
+    neg: "2,4,6,7,8,12"
   }
-
 };
-
 
 
 
