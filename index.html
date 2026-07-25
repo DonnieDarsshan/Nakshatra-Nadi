@@ -78,6 +78,7 @@ button{
 input[type="checkbox"]{
   accent-color:#10b981;
   transform:scale(1.1);
+  color-scheme: dark; /* 🔥 Forces true dark mode background on checkboxes */
 }
 
 /* ================= TABLE ================= */
@@ -301,7 +302,7 @@ body::-webkit-scrollbar-thumb:hover{
 #vimshottari-wrapper{
  box-sizing:border-box;
  width:100%;
- max-width:1200px;
+ max-width:100%; /* Changed to stretch full width */
  margin:60px auto;
  padding:24px;
 
@@ -613,6 +614,844 @@ body::-webkit-scrollbar-thumb:hover{
 <h2>NADI SIGNIFICATOR FINDER TABLE</h2>
 
 
+
+
+
+
+
+
+
+
+
+<style>
+    :root { 
+        --grid-line: #10b981;
+        --text-white: #ecfdf5; 
+        --asc-yellow: #facc15;
+    }
+
+    #onlineFetchBox { 
+        background: #021b16;
+        border: 1px solid var(--grid-line);
+        border-radius: 8px;
+        box-shadow: 0 0 16px rgba(16,185,129,.25);
+        padding: 18px 22px; 
+        margin: 20px auto 30px auto; 
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        color: var(--text-white);
+        font-weight: 700; 
+        max-width: 100%;
+    }
+    
+    .fetch-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-end; 
+        width: 100%;
+    }
+    
+    #onlineFetchBox .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    #onlineFetchBox input, #onlineFetchBox select { 
+        background: #010a08;
+        color: var(--asc-yellow); 
+        border: 1px solid var(--grid-line); 
+        border-radius: 4px;
+        padding: 6px 10px; 
+        font-weight: 700; 
+        outline: none;
+    }
+    
+    #onlineFetchBox input:focus, #onlineFetchBox select:focus {
+        box-shadow: 0 0 8px rgba(16,185,129,.5);
+    }
+    
+    #onlineFetchBox select option { background: #010a08; color: #facc15; }
+
+    /* Action Buttons */
+    .action-btn {
+        font-family: inherit;
+        font-weight: 700; 
+        font-size: 14px;
+        padding: 6px 14px; 
+        margin: 0;
+        cursor: pointer;
+        border-radius: 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+        transition: all 0.1s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-rendering: optimizeLegibility;
+        transform: none; 
+    }
+
+    .action-btn:hover { filter: brightness(1.25); }
+    .action-btn:active { transform: translateY(2px); box-shadow: 0 2px 3px rgba(0,0,0,0.8); }
+
+    .btn-clear { 
+        background: linear-gradient(135deg, #64748b, #334155);
+        color: #f8fafc; 
+        border: 1px solid rgba(255,255,255,0.2);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+    .btn-load { 
+        background: linear-gradient(135deg, #ea580c, #9a3412); 
+        color: #fffbeb;
+        border: 1px solid rgba(255,255,255,0.2);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+    .btn-save { 
+        background: linear-gradient(135deg, #2563eb, #1e40af);
+        color: #eff6ff; 
+        border: 1px solid rgba(255,255,255,0.2);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+    .btn-fetch { 
+        background: linear-gradient(135deg, #10b981, #d4af37); 
+        color: #021b16;
+        border: 1px solid #021b16;
+    }
+
+    .btn-fetch.success {
+        background: #39ff14 !important;
+        color: #000 !important;
+        box-shadow: 0 0 15px #39ff14 !important;
+        border: 1px solid #000 !important;
+    }
+</style>
+
+<div id="onlineFetchBox">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(16,185,129,0.3); padding-bottom: 10px;">
+        <div style="color: #10b981; font-size: 16px; letter-spacing: 1px; flex: 1;">&#x1F310; CLOUD HOROSCOPE FETCHER</div>
+        <div style="display: flex; gap: 10px; align-items: center; justify-content: center; flex: 1;">
+            <span style="color: #ecfdf5; font-size: 13px;">Profile Name:</span>
+            <input type="text" id="onName" placeholder="e.g. NAME" style="width: 200px; text-align: center; text-transform: uppercase;">
+        </div>
+        <div style="flex: 1;"></div>
+    </div>
+ 
+    <div class="fetch-row">
+        <div class="form-group">
+            <span style="font-size: 14px;">&#x1F4C5; Date (DD-MM-YYYY)</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input type="text" id="onDay" placeholder="DD" maxlength="2" style="width:50px; text-align:center; font-size: 14px;" onkeydown="arrowSpinner(event, 1, 31, 2)" oninput="smartJump(this, 'onMonth', 'day')"> -
+                <input type="text" id="onMonth" placeholder="MM" maxlength="2" style="width:50px; text-align:center; font-size: 14px;" onkeydown="arrowSpinner(event, 1, 12, 2)" oninput="smartJump(this, 'onYear', 'month')"> -
+                <input type="text" id="onYear" placeholder="YYYY" maxlength="4" style="width:75px; text-align:center; font-size: 14px;" onkeydown="arrowSpinner(event, 1900, 2100, 4)" oninput="smartJump(this, 'onHour', 'year')">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <span style="font-size: 14px;">&#x23F1; Time (HH:MM:SS)</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input type="text" id="onHour" placeholder="HH" maxlength="2" style="width:50px; text-align:center; font-size: 14px;" onkeydown="arrowSpinner(event, 0, 23, 2)" oninput="smartJump(this, 'onMin', 'hour')"> :
+                <input type="text" id="onMin" placeholder="MM" maxlength="2" style="width:50px; text-align:center; font-size: 14px;" onkeydown="arrowSpinner(event, 0, 59, 2)" oninput="smartJump(this, 'mapSearchQuery', 'minute')"> :
+                <input type="text" id="onSec" value="00" maxlength="2" style="width:50px; text-align:center; font-size: 14px;" onkeydown="arrowSpinner(event, 0, 59, 2)">
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 20px; align-items: flex-end; flex: 1;">
+            <div class="form-group">
+                <span style="font-size: 14px;">&#x1F4CD; Standard Places</span>
+                <select id="locationPreset" onchange="applyPresetLocation()" style="width: 190px; font-size: 14px;">
+                    <option value="manual">Manual GPS (Default)</option>
+                    <option value="13.3190737,77.1326306">Tumakuru</option>
+                    <option value="12.918880,77.634986">Bengaluru</option>
+                    <option value="13.315527,76.942059">Gubbi</option>
+                    <option value="12.304776,76.655108">Mysore</option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="padding-bottom: 1px;">
+                <div id="ageOutlineBox" style="border: 1px solid var(--grid-line); padding: 5px 16px; border-radius: 4px; background: #010a08; color: #facc15; font-size: 15px; font-weight: 800; white-space: nowrap; height: 31px; display: flex; align-items: center; letter-spacing: 0.5px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);">
+                    Age : &nbsp;-- years&nbsp; : -- months : -- days
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	
+	
+	
+	
+    
+    <div class="fetch-row" style="margin-top: 10px;">
+        <div class="form-group" style="width: 100%;">
+            <span style="font-size: 15px;">&#x1F4CD; Coordinates: Latitude | Longitude | Lat (DMS) | Lon (DMS)</span>
+            <div style="display:flex; gap:10px; align-items:center; font-size: 14px;">
+                <input type="text" id="onlineLat" value="13.340077" style="width: 110px; font-size: 14px;" oninput="syncCoords('dec')">
+                <input type="text" id="onlineLon" value="77.100621" style="width: 110px; font-size: 14px;" oninput="syncCoords('dec')">
+                <span style="color:var(--grid-line); margin:0 8px;">|</span>
+                
+                <!-- Latitude DMS -->
+                <input type="text" id="dmsLatDeg" value="13" style="width:45px; text-align:center; font-size: 14px;" oninput="syncCoords('dms')"><span style="color:#facc15;">°</span>
+                <select id="dmsLatDir" style="padding:6px 4px; width:55px; font-size: 14px;" onchange="syncCoords('dms')">
+                    <option value="N" selected>N</option><option value="S">S</option>
+                </select>
+                <input type="text" id="dmsLatMin" value="20" style="width:45px; text-align:center; font-size: 14px;" oninput="syncCoords('dms')"><span style="color:#facc15;">'</span>
+                <input type="text" id="dmsLatSec" value="24" style="width:45px; text-align:center; font-size: 14px;" oninput="syncCoords('dms')"><span style="color:#facc15;">"</span>
+                
+                <span style="color:var(--grid-line); margin:0 8px;">|</span>
+                
+                <!-- Longitude DMS -->
+                <input type="text" id="dmsLonDeg" value="77" style="width:45px; text-align:center; font-size: 14px;" oninput="syncCoords('dms')"><span style="color:#facc15;">°</span>
+                <select id="dmsLonDir" style="padding:6px 4px; width:55px; font-size: 14px;" onchange="syncCoords('dms')">
+                    <option value="E" selected>E</option><option value="W">W</option>
+                </select>
+                <input type="text" id="dmsLonMin" value="06" style="width:45px; text-align:center; font-size: 14px;" oninput="syncCoords('dms')"><span style="color:#facc15;">'</span>
+                <input type="text" id="dmsLonSec" value="02" style="width:45px; text-align:center; font-size: 14px;" oninput="syncCoords('dms')"><span style="color:#facc15;">"</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="fetch-row" style="border-top: 1px solid rgba(16,185,129,0.3); padding-top: 15px; width: 100%;">
+        <div class="form-group" style="width: 100%;">
+            <span>&#x1F50D; Online Map Search</span>
+            <div style="display:flex; gap:6px; align-items: center;">
+                <input type="text" id="mapSearchQuery" placeholder="Search Place..." style="width: 200px;" onkeydown="if(event.key === 'Enter') searchOnlineMap()">
+                <button onclick="searchOnlineMap()" class="action-btn" style="background: var(--grid-line); color: #021b16; border: 1px solid #021b16;">Search</button>
+                <select id="mapSearchResults" style="display:none; width: 250px; margin: 0;" onchange="applyMapSelection()"></select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="fetch-row" style="padding-top: 10px; justify-content: flex-end; width: 100%;">
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div id="serverWakeContainer" style="visibility: hidden; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-family: monospace; font-weight: bold;">
+                <span id="wakeMessage" style="color: #facc15; font-size: 14px;">> SYS.WAKE...</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span id="digitalClockPart" style="font-size: 28px; letter-spacing: 2px; color: #facc15;">00:30</span>
+                    <span id="progressBarPart" style="color: #10b981; font-size: 16px; letter-spacing: 1px;">[....................]</span>
+                </div>
+            </div>
+
+            <button class="action-btn btn-clear" onclick="clearFetchData()">&#x1F9F9; Clear</button>
+            <input type="file" id="loadProfileInput" accept=".json" style="display:none" onchange="loadCloudProfile(event)">
+            <button class="action-btn btn-load" onclick="document.getElementById('loadProfileInput').click()">&#x1F4C2; Load Profile</button>
+            <button class="action-btn btn-save" onclick="saveCloudProfile()">&#x1F4BE; Save Profile</button>
+            <button id="fetchCloudBtn" class="action-btn btn-fetch" onclick="fetchFromCloud()">Fetch Data &#x1F4E1;</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+function calculateAgeLive() {
+        const dInput = document.getElementById("onDay");
+        const mInput = document.getElementById("onMonth");
+        const yInput = document.getElementById("onYear");
+        const display = document.getElementById("ageOutlineBox");
+        
+        if (!dInput || !mInput || !yInput || !display) return;
+
+        const d = parseInt(dInput.value, 10);
+        const m = parseInt(mInput.value, 10);
+        const y = parseInt(yInput.value, 10);
+        
+        if (isNaN(d) || isNaN(m) || isNaN(y) || y < 1000) {
+            display.innerHTML = "Age : &nbsp;-- years&nbsp; : -- months : -- days";
+            return;
+        }
+
+        const dob = new Date(y, m - 1, d);
+        const today = new Date(); 
+        
+        if (dob > today) {
+            display.innerHTML = "Age : &nbsp;Future Date";
+            return;
+        }
+
+        let years = today.getFullYear() - dob.getFullYear();
+        let months = today.getMonth() - dob.getMonth();
+        let days = today.getDate() - dob.getDate();
+
+        if (days < 0) {
+            months--;
+            const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += prevMonth.getDate();
+        }
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        
+        display.innerHTML = `Age : &nbsp;${years} years&nbsp; : ${months} months : ${days} days`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const box = document.getElementById("onlineFetchBox");
+        if (box) {
+            box.addEventListener("input", calculateAgeLive);
+            box.addEventListener("keyup", calculateAgeLive);
+            box.addEventListener("change", calculateAgeLive);
+        }
+        setInterval(calculateAgeLive, 400);
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // --- COORDINATE SYNC ---
+    function syncCoords(source) {
+        if(source === 'dec') {
+            let lat = parseFloat(document.getElementById('onlineLat').value) || 0;
+            let lon = parseFloat(document.getElementById('onlineLon').value) || 0;
+            
+            // Latitude Math
+            document.getElementById('dmsLatDir').value = lat >= 0 ? 'N' : 'S';
+            lat = Math.abs(lat);
+            let latDeg = Math.floor(lat);
+            let latMinRaw = (lat - latDeg) * 60;
+            let latMin = Math.floor(latMinRaw);
+            let latSec = Math.round((latMinRaw - latMin) * 60);
+            if (latSec === 60) { latMin += 1; latSec = 0; }
+            if (latMin === 60) { latDeg += 1; latMin = 0; }
+            
+            document.getElementById('dmsLatDeg').value = latDeg;
+            document.getElementById('dmsLatMin').value = latMin.toString().padStart(2, '0');
+            document.getElementById('dmsLatSec').value = latSec.toString().padStart(2, '0');
+            
+            // Longitude Math
+            document.getElementById('dmsLonDir').value = lon >= 0 ? 'E' : 'W';
+            lon = Math.abs(lon);
+            let lonDeg = Math.floor(lon);
+            let lonMinRaw = (lon - lonDeg) * 60;
+            let lonMin = Math.floor(lonMinRaw);
+            let lonSec = Math.round((lonMinRaw - lonMin) * 60);
+            if (lonSec === 60) { lonMin += 1; lonSec = 0; }
+            if (lonMin === 60) { lonDeg += 1; lonMin = 0; }
+            
+            document.getElementById('dmsLonDeg').value = lonDeg;
+            document.getElementById('dmsLonMin').value = lonMin.toString().padStart(2, '0');
+            document.getElementById('dmsLonSec').value = lonSec.toString().padStart(2, '0');
+            
+        } else if (source === 'dms') {
+            let latDeg = parseFloat(document.getElementById('dmsLatDeg').value) || 0;
+            let latMin = parseFloat(document.getElementById('dmsLatMin').value) || 0;
+            let latSec = parseFloat(document.getElementById('dmsLatSec').value) || 0;
+            let latDir = document.getElementById('dmsLatDir').value;
+            let lat = latDeg + (latMin / 60) + (latSec / 3600);
+            if (latDir === 'S') lat = -lat;
+            
+            let lonDeg = parseFloat(document.getElementById('dmsLonDeg').value) || 0;
+            let lonMin = parseFloat(document.getElementById('dmsLonMin').value) || 0;
+            let lonSec = parseFloat(document.getElementById('dmsLonSec').value) || 0;
+            let lonDir = document.getElementById('dmsLonDir').value;
+            let lon = lonDeg + (lonMin / 60) + (lonSec / 3600);
+            if (lonDir === 'W') lon = -lon;
+            
+            document.getElementById('onlineLat').value = lat.toFixed(6);
+            document.getElementById('onlineLon').value = lon.toFixed(6);
+        }
+    }
+
+    function applyPresetLocation() {
+        const val = document.getElementById("locationPreset").value;
+        if (val === "manual") {
+            document.getElementById("onlineLat").value = "13.340077";
+            document.getElementById("onlineLon").value = "77.100621";
+        } else {
+            const coords = val.split(",");
+            document.getElementById("onlineLat").value = coords[0];
+            document.getElementById("onlineLon").value = coords[1];
+        }
+        syncCoords('dec');
+    }
+
+    let currentMapResults = [];
+
+    async function searchOnlineMap() {
+        const query = document.getElementById("mapSearchQuery").value.trim();
+        if (!query) return;
+
+        const btn = document.querySelector("button[onclick='searchOnlineMap()']");
+        const origText = btn.innerHTML;
+        btn.innerHTML = "Searching...";
+        btn.disabled = true;
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=10&q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            const resultsDropdown = document.getElementById("mapSearchResults");
+            resultsDropdown.innerHTML = "";
+            if (data && data.length > 0) {
+                currentMapResults = data;
+                const defaultOpt = document.createElement("option");
+                defaultOpt.text = `-- Found ${data.length} places. Select one --`;
+                defaultOpt.value = "";
+                resultsDropdown.appendChild(defaultOpt);
+                data.forEach((place, index) => {
+                    const opt = document.createElement("option");
+                    opt.text = place.display_name.length > 60 ? place.display_name.substring(0, 57) + "..." : place.display_name;
+                    opt.value = index; 
+                    resultsDropdown.appendChild(opt);
+                });
+                resultsDropdown.style.display = "block";
+            } else {
+                resultsDropdown.style.display = "none";
+            }
+        } catch (error) {
+            console.warn("Network error while searching the map.");
+        } finally {
+            btn.innerHTML = origText;
+            btn.disabled = false;
+        }
+    }
+
+    function applyMapSelection() {
+        const dropdown = document.getElementById("mapSearchResults");
+        if (dropdown.value !== "") {
+            const selectedPlace = currentMapResults[dropdown.value];
+            document.getElementById("onlineLat").value = parseFloat(selectedPlace.lat).toFixed(6);
+            document.getElementById("onlineLon").value = parseFloat(selectedPlace.lon).toFixed(6);
+            document.getElementById("locationPreset").value = "manual";
+            syncCoords('dec');
+        }
+    }
+
+    function arrowSpinner(e, min, max, padding) {
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            e.preventDefault();
+            let val = parseInt(e.target.value);
+            if (isNaN(val)) val = max > 2000 ? new Date().getFullYear() : min;
+            if (e.key === "ArrowUp") val++;
+            if (e.key === "ArrowDown") val--;
+            if (val > max) val = min;
+            if (val < min) val = max;
+            e.target.value = String(val).padStart(padding, '0');
+        }
+    }
+
+    function smartJump(currentElement, nextElementId, type) {
+        let val = currentElement.value.replace(/\D/g, '');
+        currentElement.value = val;
+        if (val.length === 0) return;
+        let shouldJump = false;
+        if (type === 'year') {
+            if (val.length >= 4) shouldJump = true;
+        } else {
+            if (val.length >= 2) shouldJump = true;
+            else if (val.length === 1) {
+                let num = parseInt(val);
+                if (type === 'day' && num >= 4) shouldJump = true;
+                if (type === 'month' && num >= 2) shouldJump = true;
+                if (type === 'hour' && num >= 3) shouldJump = true;
+                if (type === 'minute' && num >= 6) shouldJump = true;
+            }
+        }
+        if (shouldJump) {
+            if (type !== 'year' && val.length === 1) currentElement.value = "0" + val;
+            document.getElementById(nextElementId).focus();
+        }
+    }
+
+    function clearFetchData() {
+        document.getElementById("onName").value = "";
+        document.getElementById("onDay").value = "";
+        document.getElementById("onMonth").value = "";
+        document.getElementById("onYear").value = "";
+        document.getElementById("onHour").value = "";
+        document.getElementById("onMin").value = "";
+        document.getElementById("onSec").value = "00";
+        document.getElementById("onlineLat").value = "";
+        document.getElementById("onlineLon").value = "";
+        document.getElementById("dmsLatDeg").value = "";
+        document.getElementById("dmsLatMin").value = "";
+        document.getElementById("dmsLatSec").value = "";
+        document.getElementById("dmsLonDeg").value = "";
+        document.getElementById("dmsLonMin").value = "";
+        document.getElementById("dmsLonSec").value = "";
+    }
+
+    let wakeInterval = null;
+    
+    async function fetchFromCloud() {
+        const d = document.getElementById("onDay").value;
+        const m = document.getElementById("onMonth").value;
+        const y = document.getElementById("onYear").value;
+        const hr = document.getElementById("onHour").value;
+        const min = document.getElementById("onMin").value;
+        const sec = document.getElementById("onSec").value || "00";
+        const latVal = document.getElementById("onlineLat").value;
+        const lonVal = document.getElementById("onlineLon").value;
+        
+        if (!d || !m || !y || !hr || !min || !latVal || !lonVal) {
+            console.warn("Please fill in the full Date, Hour, Minute, and Coordinates.");
+            return;
+        }
+
+        let dynamicOffset = 330;
+        try {
+            const tzResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latVal}&longitude=${lonVal}&timezone=auto`);
+            const tzData = await tzResponse.json();
+            if (tzData && tzData.utc_offset_seconds !== undefined) {
+                dynamicOffset = tzData.utc_offset_seconds / 60;
+            }
+        } catch (error) {
+            console.warn("Timezone fetch failed. Falling back to IST.");
+        }
+
+        const requestData = {
+            year: parseInt(y),
+            month: parseInt(m),
+            day: parseInt(d),
+            hour: parseInt(hr),
+            minute: parseInt(min),
+            second: parseInt(sec),
+            lat: parseFloat(latVal),
+            lon: parseFloat(lonVal),
+            timezone_offset: dynamicOffset,
+            horary_mode: false,
+            ayanamsha: "kp_new"
+        };
+        
+        const btn = document.getElementById("fetchCloudBtn");
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "Fetching Data... &#x23F3;";
+        btn.disabled = true;
+
+        const wakeContainer = document.getElementById("serverWakeContainer");
+        const wakeMessage = document.getElementById("wakeMessage");
+        const digitalClockPart = document.getElementById("digitalClockPart");
+        const progressBarPart = document.getElementById("progressBarPart");
+        
+        if (wakeContainer) {
+            wakeContainer.style.visibility = "visible";
+            wakeMessage.innerText = "> INITIATING_LINK...";
+            let secondsElapsed = 0;
+            digitalClockPart.innerText = "00:00";
+            progressBarPart.innerText = "[" + ".".repeat(20) + "]";
+            
+            if (wakeInterval) clearInterval(wakeInterval);
+
+            wakeInterval = setInterval(() => {
+                secondsElapsed++;
+                digitalClockPart.innerText = String(Math.floor(secondsElapsed / 60)).padStart(2, '0') + ":" + String(secondsElapsed % 60).padStart(2, '0');
+                if (secondsElapsed <= 40) {
+                    let pipesCount = Math.floor((secondsElapsed / 40) * 100 / 5);
+                    progressBarPart.innerText = "[" + "|".repeat(pipesCount) + ".".repeat(20 - pipesCount) + "]";
+                } else {
+                    let wavePos = (secondsElapsed % 20);
+                    let waveArr = Array(20).fill('.');
+                    waveArr[wavePos] = '|';
+                    if(wavePos > 0) waveArr[wavePos-1] = '|';
+                    if(wavePos < 19) waveArr[wavePos+1] = '|';
+                    progressBarPart.innerText = "[" + waveArr.join('') + "]";
+                }
+                if (secondsElapsed === 2) wakeMessage.innerText = "> PINGING_SERVER...";
+                if (secondsElapsed === 5) wakeMessage.innerText = "> ESTABLISHING_CONNECTION...";
+                if (secondsElapsed === 15) wakeMessage.innerText = "> WAKING_COLD_INSTANCE...";
+                if (secondsElapsed === 30) wakeMessage.innerText = "> AWAITING_DATA_STREAM...";
+            }, 1000);
+        }
+
+        try {
+            const response = await fetch('https://donnie-astro-engine.onrender.com/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            });
+            const result = await response.json();
+
+            if (wakeInterval) clearInterval(wakeInterval);
+            if (wakeMessage) wakeMessage.innerText = "> LINK_ESTABLISHED";
+            if (progressBarPart) progressBarPart.innerText = "[" + "|".repeat(20) + "]";
+            setTimeout(() => { if (wakeContainer) wakeContainer.style.visibility = "hidden"; }, 2000);
+            
+            if (result.status === "success") {
+                const data = result.data ? result.data : result;
+
+                // ==========================================
+                // NATIVE INJECTION FOR NADI PROJECT
+                // ==========================================
+                if (!data.meta) data.meta = {};
+                if (!data.meta.datetime_utc) {
+                    const fY = document.getElementById("onYear").value;
+                    const fM = document.getElementById("onMonth").value.padStart(2, '0');
+                    const fD = document.getElementById("onDay").value.padStart(2, '0');
+                    const fHr = document.getElementById("onHour").value.padStart(2, '0');
+                    const fMin = document.getElementById("onMin").value.padStart(2, '0');
+                    const fSec = document.getElementById("onSec").value.padStart(2, '0') || "00";
+                    data.meta.datetime_utc = `${fY}-${fM}-${fD}T${fHr}:${fMin}:${fSec}`;
+                }
+
+                DATA = data;
+                parseSwiss();
+
+                // 1. RESET STATIC UI ELEMENTS
+                if(document.getElementById("kpMode")) document.getElementById("kpMode").checked = true;
+                if(document.getElementById("signMode")) document.getElementById("signMode").checked = false;
+                if(document.getElementById("meanNode")) document.getElementById("meanNode").checked = true;
+                if(document.getElementById("trueNode")) document.getElementById("trueNode").checked = false;
+                if(document.getElementById("compressRows")) document.getElementById("compressRows").checked = true;
+                if(document.getElementById("aspectToggle")) document.getElementById("aspectToggle").checked = false;
+                if(document.getElementById("dispositorToggle")) document.getElementById("dispositorToggle").checked = false;
+                
+                if(document.getElementById("vimHideDate")) document.getElementById("vimHideDate").checked = true;
+                if(document.getElementById("vimShiftAmount")) document.getElementById("vimShiftAmount").selectedIndex = 0;
+
+                if(document.getElementById("pivotSelect")) document.getElementById("pivotSelect").selectedIndex = 0; 
+                if(document.getElementById("templateSelect")) document.getElementById("templateSelect").value = "manual";
+                
+                if(document.getElementById("finderInputPos")) document.getElementById("finderInputPos").value = "";
+                if(document.getElementById("finderInputSupport")) document.getElementById("finderInputSupport").value = "";
+                if(document.getElementById("finderInputNeg")) document.getElementById("finderInputNeg").value = "";
+
+                // 2. RESET DYNAMIC DOM CHECKBOXES
+                if(document.getElementById("shiftedLordshipToggle")) document.getElementById("shiftedLordshipToggle").checked = false;
+                if(document.getElementById("untenantedIgnoreToggle")) document.getElementById("untenantedIgnoreToggle").checked = true;
+                if(document.getElementById("ignoreCuspalToggle")) document.getElementById("ignoreCuspalToggle").checked = false; 
+                if(document.getElementById("nodeCuspalToggle")) document.getElementById("nodeCuspalToggle").checked = false;
+                if(document.getElementById("sslToggle")) document.getElementById("sslToggle").checked = true; 
+
+                // 3. RESET GLOBAL ENGINE FLAGS
+                IGNORE_CUSPAL = false;
+                SHIFTED_LORDSHIP = false;
+                UNTENANTED_IGNORE = true;
+                NODE_CUSPAL_ENABLED = false;
+                DBA_SORT_STATE = true;
+                VIM_VISUAL_OFFSET = 0;
+
+                // AUTO SET PLANET ORDER = CHANDRA STAR
+                if (typeof PLANETS !== 'undefined' && PLANETS["Chandra"] && typeof starLord === 'function') {
+                    const chandraStar = starLord(PLANETS["Chandra"]);
+                    if(chandraStar && typeof planetOrderSel !== 'undefined'){
+                        planetOrderSel.value = chandraStar;
+                    }
+                }
+
+                if (typeof buildAll === 'function') buildAll();
+                // ==========================================
+
+                btn.innerHTML = "SUCCESS ✓";
+                btn.classList.add("success");
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove("success");
+                    btn.disabled = false;
+                }, 3000);
+                
+            } else {
+                console.warn("Server Error: " + result.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+            if (wakeInterval) clearInterval(wakeInterval);
+            if (wakeMessage) wakeMessage.innerText = "> CONNECTION_FAILED";
+            setTimeout(() => { if (wakeContainer) wakeContainer.style.visibility = "hidden"; }, 3000);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    function saveCloudProfile() {
+        const name = document.getElementById("onName").value.trim();
+        if (name.length < 2) return;
+
+        if (typeof DATA === "undefined" || !DATA) {
+            console.warn("No chart data available to save! Please fetch a chart first.");
+            return;
+        }
+
+        // Clean up Sayana from saved data to keep file size lean
+        if (DATA.ayanamshas && DATA.ayanamshas["Sayana"]) {
+            delete DATA.ayanamshas["Sayana"];
+        }
+
+        const profileData = {
+            type: "CloudHoroscopeProfile",
+            name: name,
+            date: {
+                d: document.getElementById("onDay").value,
+                m: document.getElementById("onMonth").value,
+                y: document.getElementById("onYear").value
+            },
+            time: {
+                h: document.getElementById("onHour").value,
+                min: document.getElementById("onMin").value,
+                sec: document.getElementById("onSec").value
+             },
+            coords: {
+                lat: document.getElementById("onlineLat").value,
+                lon: document.getElementById("onlineLon").value
+            },
+            chartData: DATA
+        };
+        const dataStr = JSON.stringify(profileData, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const safeName = name.replace(/[^a-z0-9]/gi, '_').toUpperCase();
+        
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${safeName}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function loadCloudProfile(event){
+        let file = event.target.files[0];
+        if (!file) return;
+
+        let reader = new FileReader();
+        reader.onload = function(e){
+            try {
+                let data = JSON.parse(e.target.result);
+                if (data.type !== "CloudHoroscopeProfile" && !data.name) return; // Basic validation
+                
+                if(data.name) document.getElementById('onName').value = data.name;
+                if(data.date){
+                    if(data.date.d) document.getElementById('onDay').value = data.date.d;
+                    if(data.date.m) document.getElementById('onMonth').value = data.date.m;
+                    if(data.date.y) document.getElementById('onYear').value = data.date.y;
+                }
+                if(data.time){
+                    if(data.time.h) document.getElementById('onHour').value = data.time.h;
+                    if(data.time.min) document.getElementById('onMin').value = data.time.min;
+                    if(data.time.sec) document.getElementById('onSec').value = data.time.sec;
+                }
+                if(data.coords){
+                    if(data.coords.lat) document.getElementById('onlineLat').value = data.coords.lat;
+                    if(data.coords.lon) document.getElementById('onlineLon').value = data.coords.lon;
+                    document.getElementById('locationPreset').value = "manual";
+                    syncCoords('dec');
+                }
+
+                document.getElementById('loadProfileInput').value = "";
+                console.log("Cloud profile loaded successfully");
+                
+                if (data.chartData) {
+                    // OFFLINE MODE: Load directly from JSON payload
+                    
+                    // --- VIMSHOTTARI FIX: Ensure datetime_utc exists in offline data ---
+                    if (!data.chartData.meta) data.chartData.meta = {};
+                    if (!data.chartData.meta.datetime_utc) {
+                        const fY = document.getElementById("onYear").value;
+                        const fM = document.getElementById("onMonth").value.padStart(2, '0');
+                        const fD = document.getElementById("onDay").value.padStart(2, '0');
+                        const fHr = document.getElementById("onHour").value.padStart(2, '0');
+                        const fMin = document.getElementById("onMin").value.padStart(2, '0');
+                        const fSec = document.getElementById("onSec").value.padStart(2, '0') || "00";
+                        data.chartData.meta.datetime_utc = `${fY}-${fM}-${fD}T${fHr}:${fMin}:${fSec}`;
+                    }
+
+                    DATA = data.chartData;
+                    parseSwiss();
+                    
+                    // Reset Static UI Elements
+                    if(document.getElementById("kpMode")) document.getElementById("kpMode").checked = true;
+                    if(document.getElementById("signMode")) document.getElementById("signMode").checked = false;
+                    if(document.getElementById("meanNode")) document.getElementById("meanNode").checked = true;
+                    if(document.getElementById("trueNode")) document.getElementById("trueNode").checked = false;
+                    if(document.getElementById("compressRows")) document.getElementById("compressRows").checked = true;
+                    if(document.getElementById("aspectToggle")) document.getElementById("aspectToggle").checked = false;
+                    if(document.getElementById("dispositorToggle")) document.getElementById("dispositorToggle").checked = false;
+                    
+                    if(document.getElementById("vimHideDate")) document.getElementById("vimHideDate").checked = true;
+                    if(document.getElementById("vimShiftAmount")) document.getElementById("vimShiftAmount").selectedIndex = 0;
+                    if(document.getElementById("pivotSelect")) document.getElementById("pivotSelect").selectedIndex = 0; 
+                    if(document.getElementById("templateSelect")) document.getElementById("templateSelect").value = "manual";
+                    
+                    if(document.getElementById("finderInputPos")) document.getElementById("finderInputPos").value = "";
+                    if(document.getElementById("finderInputSupport")) document.getElementById("finderInputSupport").value = "";
+                    if(document.getElementById("finderInputNeg")) document.getElementById("finderInputNeg").value = "";
+                    
+                    // Reset Dynamic Checkboxes
+                    if(document.getElementById("shiftedLordshipToggle")) document.getElementById("shiftedLordshipToggle").checked = false;
+                    if(document.getElementById("untenantedIgnoreToggle")) document.getElementById("untenantedIgnoreToggle").checked = true;
+                    if(document.getElementById("ignoreCuspalToggle")) document.getElementById("ignoreCuspalToggle").checked = false; 
+                    if(document.getElementById("nodeCuspalToggle")) document.getElementById("nodeCuspalToggle").checked = false;
+                    if(document.getElementById("sslToggle")) document.getElementById("sslToggle").checked = true; 
+                    
+                    // Reset Global Engine Flags
+                    IGNORE_CUSPAL = false;
+                    SHIFTED_LORDSHIP = false;
+                    UNTENANTED_IGNORE = true;
+                    NODE_CUSPAL_ENABLED = false;
+                    DBA_SORT_STATE = true;
+                    VIM_VISUAL_OFFSET = 0;
+                    
+                    // Auto Set Planet Order
+                    if (typeof PLANETS !== 'undefined' && PLANETS["Chandra"] && typeof starLord === 'function') {
+                        const chandraStar = starLord(PLANETS["Chandra"]);
+                        if(chandraStar && typeof planetOrderSel !== 'undefined'){
+                            planetOrderSel.value = chandraStar;
+                        }
+                    }
+                    
+                    // Fire the local engine directly
+                    if (typeof buildAll === 'function') buildAll();
+                    
+                } else {
+                    // LEGACY MODE: No offline data found. Do not fetch automatically.
+                    console.warn("Legacy profile loaded. Please press 'Fetch Data' manually to calculate.");
+                }
+                
+            } catch(error){
+                console.error("Invalid JSON profile format", error);
+                alert("Invalid JSON profile format");
+            }
+        };
+        reader.readAsText(file);
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- ======================================================
    ROW 1
 ====================================================== -->
@@ -818,6 +1657,7 @@ let IGNORE_CUSPAL = false;
 let SHIFTED_LORDSHIP = false;  // 🔥 OFF by default
 let NODE_CUSPAL_ENABLED = false;
 let DBA_SORT_STATE = true;
+let TENANTED_IGNORE = true;    // 🔥 ON by default
 
 /* ==============================
    UI STATE MEMORY
@@ -1298,28 +2138,34 @@ function getUntenantedPlanets(){
 
 
 /* ======================================================
+   FIND PLANET COUNT IN HOUSE (FOR REMOVE OCCUPIED RULE)
+====================================================== */
+let REMOVE_OCCUPIED = true;
+
+function countPlanetsInHouse(h) {
+    let count = 0;
+    const corePlanets = ["Surya", "Chandra", "Mangala", "Budha", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    corePlanets.forEach(p => {
+        if (PLANETS[p] !== undefined) {
+            const placed = rotateHouse(rawHouseOf(PLANETS[p]));
+            if (placed === h) count++;
+        }
+    });
+    return count;
+}
+
+/* ======================================================
    LORDSHIP FROM CUSP SIGNS
 ====================================================== */
 
 function lordships(planet){
 
-  /* ==============================
-     CHECK PIVOT TYPE
-     DO NOT SHIFT IF CSL PIVOT
-  ============================== */
   const pivot = pivotSel.value;
   const isCSLPivot = pivot.endsWith("CSL");
-
-  /* ==============================
-     LAGNA DEGREE CHECK
-  ============================== */
   const lagnaAbs = CUSPS[1];
   const lagnaSignIndex = Math.floor(lagnaAbs / 30);
   const lagnaDegreeInSign = lagnaAbs % 30;
 
-  /* ==============================
-     FINAL SHIFT DECISION
-  ============================== */
   const applyShift =
     SHIFTED_LORDSHIP &&
     !isCSLPivot &&
@@ -1338,7 +2184,14 @@ function lordships(planet){
     const signName = SIGNS[signIndex];
 
     if(SIGN_LORDS[signName] === planet){
-      list.push(rotateHouse(i));
+      const h = rotateHouse(i);
+
+      /* 🔥 NEW RULE: REMOVE LORDSHIP IF 2 OR MORE PLANETS OCCUPY THIS HOUSE */
+      if (REMOVE_OCCUPIED && countPlanetsInHouse(h) >= 2) {
+          continue; // Skip adding this lordship house
+      }
+
+      list.push(h);
     }
   }
 
@@ -1997,6 +2850,9 @@ function buildNadiIntegratedTable(){
   const prevUntenanted = 
     document.getElementById("untenantedIgnoreToggle")?.checked ?? true; // 🔥 Added fallback for Untenanted
 	
+  const prevTenanted = 
+    document.getElementById("tenantedIgnoreToggle")?.checked ?? true;   // 🔥 ON by default
+	
 	
 
   document.getElementById("nadiIntegratedWrap")?.remove();
@@ -2029,14 +2885,16 @@ const toggleWrap = document.createElement("div");
 
 toggleWrap.style.display = "flex";
 toggleWrap.style.alignItems = "center";
-toggleWrap.style.gap = "30px";
-toggleWrap.style.padding = "10px";
+/* 🔥 FIX: 12px vertical row-gap, 30px horizontal column-gap */
+toggleWrap.style.gap = "12px 30px"; 
+toggleWrap.style.padding = "12px 15px";
 toggleWrap.style.margin = "10px 0";
 toggleWrap.style.background = "#06281f";
 toggleWrap.style.border = "2px solid #10b981";
 toggleWrap.style.borderRadius = "6px";
 toggleWrap.style.fontSize = "16px";
 toggleWrap.style.fontWeight = "900";
+toggleWrap.style.flexWrap = "wrap";
 
 /* ===== HIDE SUB SUB ===== */
 const sslLabel = document.createElement("label");
@@ -2125,10 +2983,15 @@ nodeCuspLabel.appendChild(
 
 
 
+
+
+
+
+
+
+
+
 /* ===== UNTENANTED IGNORE ===== */
-
-
-
 const untenLabel=document.createElement("label");
 untenLabel.style.display="flex";
 untenLabel.style.alignItems="center";
@@ -2138,7 +3001,7 @@ untenLabel.style.cursor="pointer";
 const untenCheckbox=document.createElement("input");
 untenCheckbox.type="checkbox";
 untenCheckbox.id="untenantedIgnoreToggle";
-untenCheckbox.checked = prevUntenanted;   // 🔥 Uses our new ON fallback
+untenCheckbox.checked = prevUntenanted;
 untenCheckbox.style.width="18px";
 untenCheckbox.style.height="18px";
 
@@ -2148,17 +3011,154 @@ untenLabel.appendChild(document.createTextNode("UNTENANTED"));
 toggleWrap.appendChild(untenLabel);
 
 untenCheckbox.onchange=()=>{
-
   UNTENANTED_IGNORE = untenCheckbox.checked;
-
   if(DATA) buildAll();
 };
 
+/* ===== TENANTED OVERRIDE ===== */
+const tenLabel=document.createElement("label");
+tenLabel.style.display="flex";
+tenLabel.style.alignItems="center";
+tenLabel.style.gap="8px";
+tenLabel.style.cursor="pointer";
+
+const tenCheckbox=document.createElement("input");
+tenCheckbox.type="checkbox";
+tenCheckbox.id="tenantedIgnoreToggle";
+tenCheckbox.checked = prevTenanted;
+tenCheckbox.style.width="18px";
+tenCheckbox.style.height="18px";
+
+tenLabel.appendChild(tenCheckbox);
+tenLabel.appendChild(document.createTextNode("TENANTED"));
+
+toggleWrap.appendChild(tenLabel);
+
+tenCheckbox.onchange=()=>{
+  TENANTED_IGNORE = tenCheckbox.checked;
+  
+  // 🔥 GREY OUT LOGIC: If Tenanted is ON, lock out Untenanted
+  if(tenCheckbox.checked){
+      untenCheckbox.disabled = true;
+      untenLabel.style.opacity = "0.4";
+      untenLabel.style.cursor = "not-allowed";
+  } else {
+      untenCheckbox.disabled = false;
+      untenLabel.style.opacity = "1";
+      untenLabel.style.cursor = "pointer";
+  }
+  
+  if(DATA) buildAll();
+};
+
+// 🔥 Apply grey-out immediately on load if it was saved in memory as ON
+if(prevTenanted){
+    untenCheckbox.disabled = true;
+    untenLabel.style.opacity = "0.4";
+    untenLabel.style.cursor = "not-allowed";
+}
+
+
+
+
+
+
+
+
+
+
+
+
 toggleWrap.appendChild(nodeCuspLabel);
 
+/* ===== FIX WRAPPING SO FIRST ROW DOESN'T COMPRESS ===== */
+toggleWrap.style.flexWrap = "wrap"; 
+
+
+
+
+
+
+/* ===== REMOVE OCCUPIED TOGGLE (SECOND ROW) ===== */
+const removeOccLabel = document.createElement("label");
+removeOccLabel.style.display = "flex";
+removeOccLabel.style.alignItems = "center";
+removeOccLabel.style.gap = "8px";
+removeOccLabel.style.cursor = "pointer";
+
+const removeOccCheckbox = document.createElement("input");
+removeOccCheckbox.type = "checkbox";
+removeOccCheckbox.id = "removeOccupiedToggle";
+removeOccCheckbox.checked = (typeof REMOVE_OCCUPIED !== 'undefined') ? REMOVE_OCCUPIED : true;
+removeOccCheckbox.style.width = "18px";
+removeOccCheckbox.style.height = "18px";
+
+removeOccLabel.appendChild(removeOccCheckbox);
+removeOccLabel.appendChild(document.createTextNode("REMOVE OCCUPIED"));
+
+removeOccCheckbox.onchange = () => {
+  REMOVE_OCCUPIED = removeOccCheckbox.checked;
+  if(DATA) buildAll();
+};
+
+/* ===== MIRROR PLANET ORDER DROPDOWN (SECOND ROW) ===== */
+const mirrorOrderLabel = document.createElement("label");
+mirrorOrderLabel.style.display = "flex";
+mirrorOrderLabel.style.alignItems = "center";
+mirrorOrderLabel.style.gap = "8px";
+mirrorOrderLabel.style.fontWeight = "900"; 
+mirrorOrderLabel.style.textTransform = "uppercase";
+
+const mirrorOrderSelect = document.createElement("select");
+mirrorOrderSelect.id = "mirrorPlanetOrder";
+mirrorOrderSelect.style.background = "#021b16";
+mirrorOrderSelect.style.color = "#ecfdf5"; 
+mirrorOrderSelect.style.border = "1px solid #10b981";
+mirrorOrderSelect.style.padding = "4px 8px";
+mirrorOrderSelect.style.fontWeight = "800";
+mirrorOrderSelect.style.outline = "none";
+mirrorOrderSelect.style.cursor = "pointer";
+
+// Populate options identically to the main dropdown
+DBA_SEQUENCE.forEach(p => {
+  const o = document.createElement("option");
+  o.value = p;
+  o.text = p;
+  mirrorOrderSelect.appendChild(o);
+});
+
+// Sync initial value from the top master dropdown
+mirrorOrderSelect.value = document.getElementById("planetOrder").value;
+
+// When changed, update the master dropdown and rebuild
+mirrorOrderSelect.onchange = () => {
+  document.getElementById("planetOrder").value = mirrorOrderSelect.value;
+  if(DATA) buildAll();
+};
+
+mirrorOrderLabel.appendChild(document.createTextNode("PLANET ORDER :"));
+mirrorOrderLabel.appendChild(mirrorOrderSelect);
+
+/* Force flex to wrap to a new line (True Second Row) */
+const flexBreak = document.createElement("div");
+flexBreak.style.width = "100%";
+flexBreak.style.height = "0";
+
+// Append everything to the container
+toggleWrap.appendChild(flexBreak);
+toggleWrap.appendChild(removeOccLabel);
+toggleWrap.appendChild(mirrorOrderLabel); // 🔥 This adds the dropdown right next to the checkbox
 
 /* ADD TO PAGE */
 wrap.appendChild(toggleWrap);
+
+
+
+
+
+
+
+
 
 
 
@@ -2224,168 +3224,159 @@ wrap.appendChild(toggleWrap);
 
 
 
-function effectiveLinks(plA,plB){
 
-  /* ================================
-     MERGE HOUSE LISTS
-  ================================= */
-  
-  
+
+
+function effectiveLinks(plA, plB) {
+
   /* =================================
-   UNTENANTED IGNORE RULE
-================================= */
-
-if(UNTENANTED_IGNORE){
-
-  if(UNTENANTED_CACHE[plA]) plB=null;
-  if(UNTENANTED_CACHE[plB]) plA=null;
-
-}
+     TENANTED / UNTENANTED RULES
+  ================================= */
+  let keepPlA = false;
+  let isUntenanted = false; 
+  
+  if (plA) {
+      isUntenanted = UNTENANTED_CACHE[plA];
+      
+      if (TENANTED_IGNORE) {
+          keepPlA = true; 
+      } 
+      else if (UNTENANTED_IGNORE && isUntenanted) {
+          keepPlA = true; 
+      }
+  }
 
   const listA = plA ? getListFromHouseString(plA) : [];
   const listB = plB ? getListFromHouseString(plB) : [];
 
-  let merged = [...listA, ...listB];
-  merged.sort((a,b)=>a-b);
+  if (!keepPlA) {
+      listA.length = 0; 
+  }
 
   /* ================================
-     IDENTIFY IMMUNE HOUSES
-     (cuspal + 11 + 12)
+     IDENTIFY IMMUNE HOUSES (CUSPAL + 11 & 12)
   ================================= */
+  function getCuspal(pl){
+      if(!pl) return []; 
+      return cuspConj(pl, PLANETS[pl]) || [];
+  }
 
   const cuspalSet = new Set([
-    ...getCuspal(plA),
-    ...getCuspal(plB)
+      ...getCuspal(plA),
+      ...getCuspal(plB)
   ]);
 
-  const immune = [];
-  const fighters = [];
+  const immuneA = [];
+  const immuneB = [];
+  const fightersA = [];
+  const fightersB = [];
 
-  merged.forEach(n=>{
-    if(cuspalSet.has(n) || n===11 || n===12){
-      immune.push(n);
-    }else{
-      fighters.push(n);
-    }
+  listA.forEach(n => {
+    if (n === 11 || n === 12 || cuspalSet.has(n)) immuneA.push(n);
+    fightersA.push(n); 
+  });
+  
+  listB.forEach(n => {
+    if (n === 11 || n === 12 || cuspalSet.has(n)) immuneB.push(n);
+    fightersB.push(n);
   });
 
+  /* =================================
+     STEP 1 — CROSS-LEVEL CANCELLATION
+  ================================= */
+  const countsA = {};
+  const countsB = {};
+  
+  fightersA.forEach(n => countsA[n] = (countsA[n] || 0) + 1);
+  fightersB.forEach(n => countsB[n] = (countsB[n] || 0) + 1);
 
+  const cancelA = {};
+  const cancelB = {};
 
-
-
-
-/* =================================
-   STEP 1 — COUNT BASED CONSECUTIVE CANCEL
-   each x cancels one (x+1)
-================================= */
-
-const counts = {};
-
-fighters.forEach(n=>{
-  counts[n] = (counts[n] || 0) + 1;
-});
-
-/* process numbers in ascending order */
-const nums = Object.keys(counts).map(Number).sort((a,b)=>a-b);
-
-nums.forEach(n=>{
-
-  const next = n + 1;
-
-  if(counts[n] && counts[next]){
-
-    const cancel = Math.min(counts[n], counts[next]);
-    counts[next] -= cancel;
-
-    if(counts[next] <= 0){
-      delete counts[next];
-    }
+  function getTarget(x) {
+      if (x === 10) return null; 
+      if (x === 12) return 1;    
+      return x + 1;              
   }
 
-});
+  // 🔥 ONLY FIGHT IF PLANET HAS $ SYMBOL
+  if (isUntenanted) {
+      for (let x = 1; x <= 12; x++) {
+          const y = getTarget(x);
+          if (y === null || y === undefined) continue;
 
-/* rebuild survivors list with duplicates preserved */
-const survivors = [];
+          if (countsA[x] && countsB[y]) {
+              cancelB[y] = (cancelB[y] || 0) + Math.min(countsA[x], countsB[y]);
+          }
+          if (countsB[x] && countsA[y]) {
+              cancelA[y] = (cancelA[y] || 0) + Math.min(countsB[x], countsA[y]);
+          }
+      }
+  }
 
-Object.keys(counts)
-  .map(Number)
-  .sort((a,b)=>a-b)
-  .forEach(n=>{
-    for(let i=0;i<counts[n];i++){
-      survivors.push(n);
-    }
-  });
+  const survA = [];
+  const survB = [];
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  for (let i = 1; i <= 12; i++) {
+      let sA = (countsA[i] || 0) - (cancelA[i] || 0);
+      if (sA > 0) for (let k = 0; k < sA; k++) survA.push(i);
 
-  /* =================================
-     STEP 2 — YOUR EXISTING DOMINANCE
-     (if you had +4 logic etc)
-     KEEP survivors AS IS
-  ================================= */
-
-  let finalRoots = [...new Set(survivors)].sort((a,b)=>a-b);
+      let sB = (countsB[i] || 0) - (cancelB[i] || 0);
+      if (sB > 0) for (let k = 0; k < sB; k++) survB.push(i);
+  }
 
   /* =================================
-     STEP 3 — FINAL CUSTOM NADI RULES
-     (APPLY ONLY AT THE END)
+     STEP 2 — STRICT CROSS-LEVEL DOMINANCE RULES
   ================================= */
+  let finalRootsA = new Set(survA);
+  let finalRootsB = new Set(survB);
 
   const FINAL_DOM_RULES = {
-  "2,6":1,
-  "3,7":2,
-  "4,8":3,
-  "5,9":4,
-  "6,10":5,
-  "7,11":6,
-  "8,12":7,
-  "1,9":8,
-  "2,10":9,
-  "3,11":10,
-  "4,12":11,
-  "1,5":12
-};
+    "2,6":1, "3,7":2, "4,8":3, "5,9":4, "6,10":5, "7,11":6,
+    "8,12":7, "1,9":8, "2,10":9, "3,11":10, "4,12":11, "1,5":12
+  };
 
-  let changed = true;
+  // 🔥 ONLY APPLY DOMINANCE KILLS IF PLANET HAS $ SYMBOL
+  if (isUntenanted) {
+      let changed = true;
 
-  while(changed){
+      while(changed){
+        changed = false;
 
-    changed = false;
-    const set = new Set(finalRoots);
+        for(const pairKey in FINAL_DOM_RULES){
+          const [a,b] = pairKey.split(",").map(Number);
+          const kill  = FINAL_DOM_RULES[pairKey];
 
-    for(const pairKey in FINAL_DOM_RULES){
+          // 1. If Level A has the Pair, and Level B has the Target -> Kill Target in B
+          if(finalRootsA.has(a) && finalRootsA.has(b) && finalRootsB.has(kill)){
+            finalRootsB.delete(kill);
+            changed = true;
+          }
 
-      const [a,b] = pairKey.split(",").map(Number);
-      const kill  = FINAL_DOM_RULES[pairKey];
-
-      if(set.has(a) && set.has(b) && set.has(kill)){
-        set.delete(kill);
-        changed = true;
+          // 2. If Level B has the Pair, and Level A has the Target -> Kill Target in A
+          if(finalRootsB.has(a) && finalRootsB.has(b) && finalRootsA.has(kill)){
+            finalRootsA.delete(kill);
+            changed = true;
+          }
+        }
       }
-    }
-
-    finalRoots = [...set].sort((x,y)=>x-y);
   }
 
   /* =================================
-     STEP 4 — ADD IMMUNE BACK
+     STEP 3 — ADD IMMUNE BACK AND MERGE
   ================================= */
-
-  const final = [...new Set([...finalRoots, ...immune])];
-  final.sort((a,b)=>a-b);
+  const final = [...new Set([...finalRootsA, ...finalRootsB, ...immuneA, ...immuneB])];
+  final.sort((a,b) => a - b);
 
   return final.join(",");
 }
+
+
+
+
+
+
+
 
 
 
@@ -3623,9 +4614,1489 @@ document.getElementById("vimHideDate").onchange = function(){
 
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+  #rotato-main-container {
+    margin-top: 60px;
+    margin-bottom: 60px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  #rotato-header {
+    text-align: center;
+    color: #d4af37;
+    font-size: 30px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+  }
+
+  #rotato-content {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease;
+  }
+
+  .rotato-inner {
+    padding: 20px;
+    background: #020d0a;
+    border: 1px solid #10b981;
+    border-radius: 8px;
+    color: #e5e7eb;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  
+  .rotato-inner h2 { 
+    text-align: left; 
+    color: #10b981; 
+    font-size: 24px; 
+    margin-bottom: 20px; 
+  }
+  
+  .rotato-controls { 
+    margin-bottom: 15px; 
+    display: flex; 
+    gap: 15px; 
+    flex-wrap: wrap; 
+    align-items: center; 
+    font-weight: 900; 
+    font-size: 15px;
+  }
+  
+  .rotato-controls select { 
+    background: #020617; 
+    color: #e5e7eb; 
+    border: 1px solid #10b981; 
+    padding: 6px 10px; 
+    font-weight: 900; 
+  }
+  
+  .rotato-controls input[type="radio"], 
+  .rotato-controls input[type="checkbox"] { 
+    accent-color: #10b981; 
+    margin-right: 5px; 
+    transform: scale(1.1);
+  }
+
+  /* ===== TABLE CONTAINERS ===== */
+  .rotato-table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 30px;
+    scrollbar-width: thin;
+    scrollbar-color: #10b981 #000;
+  }
+  
+  .rotato-table-container::-webkit-scrollbar { height: 10px; }
+  .rotato-table-container::-webkit-scrollbar-track { background: #000; }
+  .rotato-table-container::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
+
+  /* ===== BASE TABLE STYLES ===== */
+  .rotato-inner table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 17px !important; /* Increased font size */
+    background: #021b16;
+  }
+  
+  .rotato-inner th { 
+    border: 1px solid rgba(16, 185, 129, 0.4); 
+    padding: 10px 4px; 
+    text-align: center; 
+    background: #064e3b; 
+    color: #facc15; 
+  }
+
+  /* Slim Normal Text for Cells */
+  .rotato-inner td { 
+    border: 1px solid rgba(16, 185, 129, 0.4); 
+    padding: 10px 4px; 
+    text-align: center; 
+    white-space: normal; 
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.4;
+    font-weight: normal !important; /* Ensures text is slim */
+  }
+
+  /* ===== MAIN TABLE SPECIFIC WIDTHS ===== */
+  #rotatoMainTable {
+    table-layout: fixed;
+    min-width: 800px;
+  }
+  #rotatoMainTable th:nth-child(1) { width: 16%; } /* Planet */
+  #rotatoMainTable th:nth-child(2) { width: 18%; } /* Sign */
+  #rotatoMainTable th:nth-child(3) { width: 10%; } /* Degree */
+  #rotatoMainTable th:nth-child(4) { width: 10%; } /* House */
+  #rotatoMainTable th:nth-child(5) { width: 21%; } /* Deg Diff */
+  #rotatoMainTable th:nth-child(6) { width: 25%; } /* Aspect */
+
+  /* ===== ASPECT TABLES EQUAL WIDTHS (FORCED FIX) ===== */
+  #rotatoPlanetAspectTable, 
+  #rotatoCuspAspectTable {
+    width: 100%;
+    table-layout: fixed; 
+    min-width: 1100px; 
+  }
+
+  /* Force exact mathematical equality: 11 columns total */
+  #rotatoPlanetAspectTable th, 
+  #rotatoPlanetAspectTable td { 
+    width: 9.09%; 
+  }
+
+  /* Force exact mathematical equality: 13 columns total */
+  #rotatoCuspAspectTable th, 
+  #rotatoCuspAspectTable td { 
+    width: 7.69%; 
+  }
+
+  /* Aspect Tables Theme */
+  #rotatoPlanetAspectTable thead th, 
+  #rotatoCuspAspectTable thead th { 
+    background: #800040; 
+    color: #fff; 
+  }
+  
+  #rotatoPlanetAspectTable tbody td:first-child, 
+  #rotatoCuspAspectTable tbody td:first-child { 
+    background: #003366; 
+    font-weight: normal !important; 
+    color: #fff; 
+  }
+
+  .aspect-good { color: #22c55e; font-weight: normal !important; }
+  .aspect-bad { color: #ef4444; font-weight: normal !important; }
+  .aspect-neutral { color: #f59e0b; font-weight: normal !important; }
+  .aspect-white { color: #facc15; font-weight: normal !important; }
+</style>
+
+<div id="rotato-main-container">
+  <h2 id="rotato-header">PLANET ROTATION TOOL (KP / VEDIC) ▼</h2>
+  
+  <div id="rotato-content">
+    <div class="rotato-inner">
+      
+      <div class="rotato-controls">
+        Rotate from:
+        <select id="rotatoPivotSelect"></select>
+
+        <label><input type="checkbox" id="rotatoIgnoreDegrees"> Ignore Degrees</label>
+        <label><input type="checkbox" id="rotatoReverseCounting"> Retro</label>
+        <label><input type="checkbox" id="rotatoLegacyOppConj" checked> Subtract 180°</label>
+        <label><input type="checkbox" id="rotatoPivotRowFromLagna" checked> Actual Position</label>
+
+        <label><input type="radio" name="rotatoHouseSystem" value="KP" checked> KP</label>
+        <label><input type="radio" name="rotatoHouseSystem" value="Vedic"> Vedic</label>
+      </div>
+
+      <div class="rotato-table-container">
+        <table id="rotatoMainTable">
+          <thead>
+            <tr>
+              <th>Planet</th>
+              <th>Sign</th>
+              <th>Degree</th>
+              <th>House</th>
+              <th>Degree Difference</th>
+              <th>Aspect</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h2 style="margin-top:20px; color:#d4af37;">Planet → Planet Aspects</h2>
+      <div class="rotato-controls" style="margin:8px 0 16px">
+        Base Planet :
+        <select id="rotatoPlanetAspectPivot"></select>
+        <label style="margin-left:12px; display:inline-flex; align-items:center; gap:4px;">
+          <input type="checkbox" id="rotatoFillPlanetsChk" checked>
+          Fill Planets
+        </label>
+        <label style="margin-left:12px; display:inline-flex; align-items:center; gap:4px;">
+          <input type="checkbox" id="rotatoShowSignsChk">
+          Show + & -
+        </label>
+      </div>
+
+      <div class="rotato-table-container">
+        <table id="rotatoPlanetAspectTable">
+          <thead><tr><th>Planet</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h2 style="margin-top:20px; color:#d4af37;">Planet → Cusp Aspects</h2>
+      <div class="rotato-table-container">
+        <table id="rotatoCuspAspectTable">
+          <thead><tr><th>Planet</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======================================================
+   ROTATO ENGINE INTEGRATION & RESET LOGIC
+====================================================== */
+const ROTATO_SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const ROTATO_PLANETS = ["Lagna","Surya","Chandra","Mangala","Rahu","Jupiter","Saturn","Budha","Ketu","Venus"];
+
+/* Natural break formatting with standard hyphens and spaces */
+const ROTATO_ASPECTS = [
+  { d:0, o:13, n:"Conjuct - Depends", c:"aspect-white" },
+  { d:180, o:8, n:"Oppo", c:"aspect-bad" },
+  { d:60, o:5, n:"Sextile", c:"aspect-good" },
+  { d:120, o:8, n:"Trine", c:"aspect-good" },
+  { d:72, o:2, n:"Quintile", c:"aspect-good" },
+  { d:144, o:2, n:"Bi - quintile", c:"aspect-good" },
+  { d:18, o:1, n:"Vigintile", c:"aspect-white" },
+  { d:36, o:1, n:"Decile", c:"aspect-white" },
+  { d:54, o:1, n:"Tri - Vigintile", c:"aspect-white" },
+  { d:40, o:1.5, n:"Novile", c:"aspect-white" },
+  { d:80, o:1.5, n:"Binovile", c:"aspect-white" },
+  { d:30, o:3, n:"Semi - Sextile", c:"aspect-good" },
+  { d:150, o:4, n:"Quincunx", c:"aspect-bad" },
+  { d:51.43, o:1.5, n:"Septile", c:"aspect-neutral" },
+  { d:102.86, o:1.5, n:"Biseptile", c:"aspect-neutral" },
+  { d:154.29, o:1.5, n:"Tri - septile", c:"aspect-neutral" },
+  { d:45, o:3, n:"Semi - Square", c:"aspect-bad" },
+  { d:90, o:6, n:"Square", c:"aspect-bad" },
+  { d:135, o:3, n:"Sesqui - Quadrate", c:"aspect-bad" },
+  { d:165, o:2, n:"Quin - Decile", c:"aspect-bad" }
+];
+
+let rotatoInitialized = false;
+let rotatoLastChartId = ""; // Tracks chart changes for resetting
+
+/* --- Reset Function --- */
+function rotatoCheckAndReset() {
+  let currentId = "";
+  if (typeof CUSPS !== 'undefined' && CUSPS[1]) currentId += CUSPS[1].toFixed(4);
+  if (typeof PLANETS !== 'undefined' && PLANETS["Chandra"]) currentId += "-" + PLANETS["Chandra"].toFixed(4);
+  
+  // If the chart ID changed, it means a NEW chart was loaded
+  if (currentId !== rotatoLastChartId && currentId !== "") {
+      rotatoLastChartId = currentId;
+      
+      // Force UI Defaults for fresh chart calculations
+      document.getElementById("rotatoPivotSelect").value = "Lagna";
+      document.getElementById("rotatoIgnoreDegrees").checked = false;
+      document.getElementById("rotatoReverseCounting").checked = false;
+      document.getElementById("rotatoLegacyOppConj").checked = true;
+      document.getElementById("rotatoPivotRowFromLagna").checked = true;
+      
+      const kpRadio = document.querySelector('input[name="rotatoHouseSystem"][value="KP"]');
+      if (kpRadio) kpRadio.checked = true;
+      
+      document.getElementById("rotatoPlanetAspectPivot").value = "Birth";
+      document.getElementById("rotatoFillPlanetsChk").checked = true;
+      document.getElementById("rotatoShowSignsChk").checked = false;
+  }
+}
+
+/* --- Collapsible Logic --- */
+document.getElementById('rotato-header').onclick = function() {
+  const content = document.getElementById('rotato-content');
+  if (content.style.maxHeight && content.style.maxHeight !== "0px") {
+    content.style.maxHeight = null;
+  } else {
+    content.style.maxHeight = content.scrollHeight + 800 + "px"; // +800 buffer for dropdowns & wrapping
+  }
+};
+
+/* --- Update Max Height if dynamically rendering while open --- */
+function updateRotatoHeight() {
+  const content = document.getElementById('rotato-content');
+  if (content.style.maxHeight && content.style.maxHeight !== "0px") {
+    content.style.maxHeight = content.scrollHeight + 800 + "px";
+  }
+}
+
+function rotatoAbsToSignDeg(abs) {
+  let a = abs % 360;
+  if(a < 0) a += 360;
+  const signIndex = Math.floor(a / 30);
+  const degree = +(a - signIndex * 30).toFixed(2);
+  return { sign: ROTATO_SIGNS[signIndex], degree: Math.floor(degree) };
+}
+
+function getRotatoAbs(p) {
+  if (p === "Lagna") return typeof CUSPS !== 'undefined' && CUSPS[1] !== undefined ? CUSPS[1] : null;
+  return typeof PLANETS !== 'undefined' && PLANETS[p] !== undefined ? PLANETS[p] : null;
+}
+
+function rotatoDegreeQuality(diff){
+  if((diff>=14 && diff<=26) || (diff>=54 && diff<=66) || (diff>=114 && diff<=126)) return {t:"Good",c:"aspect-good"};
+  if((diff>=39 && diff<=51) || (diff>=84 && diff<=96) || (diff>=129 && diff<=141) || (diff>=159 && diff<=171)) return {t:"Bad",c:"aspect-bad"};
+  return {t:"Neutral",c:"aspect-neutral"};
+}
+
+function rotatoGetAspectLabel(diff, rawDiff){
+  for(const a of ROTATO_ASPECTS){
+    if(a.d===0){ if(Math.abs(rawDiff) <= a.o) return `<span class="${a.c}">${a.n}</span>`; }
+    else if(a.d===180){ if(Math.abs(rawDiff-180)<=a.o) return `<span class="${a.c}">${a.n}</span>`; }
+    else{ if(Math.abs(diff-a.d)<=a.o) return `<span class="${a.c}">${a.n}</span>`; }
+  }
+  const q = rotatoDegreeQuality(diff);
+  return `<span class="${q.c}">${q.t}</span>`;
+}
+
+function rotatoGetBirthDashaLord(){
+  const moonAbs = getRotatoAbs("Chandra");
+  if(moonAbs === null) return "Surya";
+  const NAK_LENGTH = 360/27;
+  const LORDS = ["Ketu","Venus","Surya","Chandra","Mangala","Rahu","Jupiter","Saturn","Budha","Ketu","Venus","Surya","Chandra","Mangala","Rahu","Jupiter","Saturn","Budha","Ketu","Venus","Surya","Chandra","Mangala","Rahu","Jupiter","Saturn","Budha"];
+  return LORDS[Math.floor(moonAbs / NAK_LENGTH)];
+}
+
+function rotatoGetCurrentDashaLord(){
+  const moonAbs = getRotatoAbs("Chandra");
+  if(moonAbs === null || typeof DATA === 'undefined' || !DATA.meta || !DATA.meta.datetime_utc) return "Surya";
+  const NAK_LENGTH = 360/27;
+  const nakIndex = Math.floor(moonAbs / NAK_LENGTH);
+  const progress = (moonAbs - (nakIndex * NAK_LENGTH)) / NAK_LENGTH;
+  const LORDS = ["Ketu","Venus","Surya","Chandra","Mangala","Rahu","Jupiter","Saturn","Budha","Ketu","Venus","Surya","Chandra","Mangala","Rahu","Jupiter","Saturn","Budha","Ketu","Venus","Surya","Chandra","Mangala","Rahu","Jupiter","Saturn","Budha"];
+  const DASHA_YEARS = {Ketu:7,Venus:20,Surya:6,Chandra:10,Mangala:7,Rahu:18,Jupiter:16,Saturn:19,Budha:17};
+  let lord = LORDS[nakIndex];
+  const balanceYears = DASHA_YEARS[lord] * (1-progress);
+  const birth = new Date(DATA.meta.datetime_utc);
+  const yearsPassed = (new Date() - birth) / (365.25*24*3600*1000);
+  const order = ["Ketu","Venus","Surya","Chandra","Mangala","Rahu","Jupiter","Saturn","Budha"];
+  let cyclePos = yearsPassed - balanceYears;
+  if(cyclePos < 0) return lord;
+  cyclePos = cyclePos % 120;
+  let idx = (order.indexOf(lord) + 1) % 9;
+  while(true){
+    const d = DASHA_YEARS[order[idx]];
+    if(cyclePos <= d) return order[idx];
+    cyclePos -= d;
+    idx = (idx+1) % 9;
+  }
+}
+
+function rotatoGetHouseFromPivot(pivotAbs, targetAbs, reverse, system){
+  if(pivotAbs === null || targetAbs === null) return "";
+  let diff = reverse ? pivotAbs - targetAbs : targetAbs - pivotAbs;
+  if(diff < 0) diff += 360;
+  let house = system === "Vedic" ? Math.floor((diff+15)/30)+1 : Math.floor(diff/30)+1;
+  if(house > 12) house -= 12;
+  return house;
+}
+
+
+
+
+
+
+
+
+function buildRotatoTables() {
+  if (typeof PLANETS === 'undefined' || Object.keys(PLANETS).length === 0) return;
+
+  const pivotSelect = document.getElementById("rotatoPivotSelect").value || "Lagna";
+  const ignoreDeg = document.getElementById("rotatoIgnoreDegrees").checked;
+  const reverseCnt = document.getElementById("rotatoReverseCounting").checked;
+  const legacyOpp = document.getElementById("rotatoLegacyOppConj").checked;
+  const pivotRowActual = document.getElementById("rotatoPivotRowFromLagna").checked;
+  const houseSys = document.querySelector('input[name="rotatoHouseSystem"]:checked').value;
+  
+  // Read our new Show Signs checkbox
+  const showSigns = document.getElementById("rotatoShowSignsChk").checked;
+
+  // 1. MAIN TABLE
+  const tbodyMain = document.querySelector("#rotatoMainTable tbody");
+  tbodyMain.innerHTML = "";
+  const startIdx = ROTATO_PLANETS.indexOf(pivotSelect);
+  const orderedMain = [...ROTATO_PLANETS.slice(startIdx), ...ROTATO_PLANETS.slice(0, startIdx)];
+  const pivotAbs = getRotatoAbs(pivotSelect);
+  const lagnaAbs = getRotatoAbs("Lagna");
+
+  if(pivotAbs !== null) {
+    orderedMain.forEach(p => {
+      if (pivotSelect !== "Lagna" && p === "Lagna") return;
+      const pAbs = getRotatoAbs(p);
+      if (pAbs === null) return;
+      const sd = rotatoAbsToSignDeg(pAbs);
+      
+      let rawDiff = pAbs - pivotAbs;
+      if (rawDiff < 0) rawDiff += 360;
+      if (reverseCnt) { rawDiff = 360 - rawDiff; if(rawDiff === 360) rawDiff = 0; }
+      let displayDiff = rawDiff;
+      if (legacyOpp && rawDiff > 180 && rawDiff <= 359) displayDiff = rawDiff - 180;
+      
+      let basePivotAbs = pivotAbs;
+      if (pivotRowActual && pivotSelect !== "Lagna" && p === pivotSelect && lagnaAbs !== null) basePivotAbs = lagnaAbs;
+      const house = rotatoGetHouseFromPivot(basePivotAbs, pAbs, reverseCnt, houseSys);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="font-weight:900 !important;">${p}</td>
+        <td>${sd.sign}</td>
+        <td>${sd.degree}</td>
+        <td style="font-weight:900 !important;">${house}</td>
+        <td>${ignoreDeg ? "" : displayDiff.toFixed(2) + "°"}</td>
+        <td>${rotatoGetAspectLabel(displayDiff, rawDiff)}</td>
+      `;
+      tbodyMain.appendChild(tr);
+    });
+  }
+
+  // 2. PLANET ASPECT TABLE
+  let aspPivot = document.getElementById("rotatoPlanetAspectPivot").value || "Surya";
+  if(aspPivot === "Birth") aspPivot = rotatoGetBirthDashaLord();
+  if(aspPivot === "Current") aspPivot = rotatoGetCurrentDashaLord();
+
+  const basePlanets = ROTATO_PLANETS.filter(p => p !== "Lagna");
+  const aspStart = basePlanets.indexOf(aspPivot) > -1 ? basePlanets.indexOf(aspPivot) : 0;
+  const orderedAsp = [...basePlanets.slice(aspStart), ...basePlanets.slice(0, aspStart)];
+  const fillPlanets = document.getElementById("rotatoFillPlanetsChk").checked;
+
+  const tHeadPlanet = document.querySelector("#rotatoPlanetAspectTable thead tr");
+  tHeadPlanet.innerHTML = "<th>Planet</th>" + orderedAsp.map(p => {
+    const a = getRotatoAbs(p);
+    return a !== null ? `<th>${p}<br>${a.toFixed(2)}°</th>` : `<th>${p}</th>`;
+  }).join("");
+
+  const tbodyPlanet = document.querySelector("#rotatoPlanetAspectTable tbody");
+  tbodyPlanet.innerHTML = "";
+  orderedAsp.forEach(p1 => {
+    const abs1 = getRotatoAbs(p1);
+    if(abs1 === null) return;
+    const tr = document.createElement("tr");
+    let html = `<td>${p1}<br>${abs1.toFixed(2)}°</td>`;
+    
+    orderedAsp.forEach(p2 => {
+      const abs2 = getRotatoAbs(p2);
+      if(abs2 === null) { html += "<td></td>"; return; }
+      if(p1 === p2) {
+        if(!fillPlanets) { html += "<td></td>"; return; }
+        let lAbs = getRotatoAbs("Lagna");
+        if(lAbs === null) { html += "<td></td>"; return; }
+        
+        let dirDiff = abs1 - lAbs;
+        if (dirDiff > 180) dirDiff -= 360;
+        if (dirDiff < -180) dirDiff += 360;
+        if (reverseCnt) dirDiff = -dirDiff;
+        let diff = Math.abs(dirDiff);
+        let signStr = showSigns ? (dirDiff >= 0 ? "+" : "-") : "";
+
+        const house = rotatoGetHouseFromPivot(lAbs, abs1, reverseCnt, houseSys);
+        html += `<td>${rotatoGetAspectLabel(diff, diff)}<br>[${house}] ${signStr}${diff.toFixed(2)}°</td>`;
+        return;
+      }
+      
+      let dirDiff = abs2 - abs1;
+      if (dirDiff > 180) dirDiff -= 360;
+      if (dirDiff < -180) dirDiff += 360;
+      if (reverseCnt) dirDiff = -dirDiff;
+      let diff = Math.abs(dirDiff);
+      let signStr = showSigns ? (dirDiff >= 0 ? "+" : "-") : "";
+
+      let label = rotatoGetAspectLabel(diff, diff);
+      if(((p1==="Rahu" && p2==="Ketu") || (p1==="Ketu" && p2==="Rahu")) && Math.abs(diff-180) <= 8) {
+        label = `<span class="aspect-white">Oppo</span>`;
+      }
+      const house = rotatoGetHouseFromPivot(abs1, abs2, reverseCnt, houseSys);
+      html += `<td>${label}<br>[${house}] ${signStr}${diff.toFixed(2)}°</td>`;
+    });
+    tr.innerHTML = html;
+    tbodyPlanet.appendChild(tr);
+  });
+
+  // 3. CUSP ASPECT TABLE
+  const tHeadCusp = document.querySelector("#rotatoCuspAspectTable thead tr");
+  tHeadCusp.innerHTML = "<th>Planet</th>" + [...Array(12)].map((_, i) => {
+    let c = CUSPS[i+1];
+    if(i === 0 && lagnaAbs !== null) c = lagnaAbs;
+    return c !== undefined ? `<th>C${i+1}<br>${c.toFixed(2)}°</th>` : `<th>C${i+1}</th>`;
+  }).join("");
+
+  const tbodyCusp = document.querySelector("#rotatoCuspAspectTable tbody");
+  tbodyCusp.innerHTML = "";
+  orderedAsp.forEach(p => {
+    const abs1 = getRotatoAbs(p);
+    if(abs1 === null) return;
+    const tr = document.createElement("tr");
+    let html = `<td>${p}<br>${abs1.toFixed(2)}°</td>`;
+    for(let i=1; i<=12; i++){
+      let c = CUSPS[i];
+      if(i === 1 && lagnaAbs !== null) c = lagnaAbs;
+      if(c === undefined) { html += "<td></td>"; continue; }
+      
+      let dirDiff = c - abs1;
+      if (dirDiff > 180) dirDiff -= 360;
+      if (dirDiff < -180) dirDiff += 360;
+      if (reverseCnt) dirDiff = -dirDiff;
+      let diff = Math.abs(dirDiff);
+      let signStr = showSigns ? (dirDiff >= 0 ? "+" : "-") : "";
+
+      html += `<td>${rotatoGetAspectLabel(diff, diff)}<br>${signStr}${diff.toFixed(2)}°</td>`;
+    }
+    tr.innerHTML = html;
+    tbodyCusp.appendChild(tr);
+  });
+  
+  updateRotatoHeight();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+function initRotato() {
+  if (!rotatoInitialized) {
+    const pivotSel = document.getElementById("rotatoPivotSelect");
+    ROTATO_PLANETS.forEach(p => pivotSel.add(new Option(p, p)));
+    pivotSel.value = "Lagna";
+
+    const aspPivot = document.getElementById("rotatoPlanetAspectPivot");
+    ["Birth", "Current"].forEach(p => aspPivot.add(new Option(p, p)));
+    const basePlanets = ROTATO_PLANETS.filter(p => p !== "Lagna");
+    basePlanets.forEach(p => aspPivot.add(new Option(p, p))); // Cycle 1
+    basePlanets.forEach(p => aspPivot.add(new Option(p, p))); // Cycle 2
+    aspPivot.value = "Birth";
+
+    // Bind events
+    ['rotatoPivotSelect', 'rotatoIgnoreDegrees', 'rotatoReverseCounting', 'rotatoLegacyOppConj', 'rotatoPivotRowFromLagna', 'rotatoPlanetAspectPivot', 'rotatoFillPlanetsChk', 'rotatoShowSignsChk'].forEach(id => {
+      document.getElementById(id).addEventListener('change', buildRotatoTables);
+    });
+    document.querySelectorAll('input[name="rotatoHouseSystem"]').forEach(r => r.addEventListener('change', buildRotatoTables));
+
+    rotatoInitialized = true;
+  }
+  
+  // RESET UI Defaults if a new chart is loaded
+  rotatoCheckAndReset();
+  
+  // Auto set Dasha lord if birth data exists
+  const aspPivotElem = document.getElementById("rotatoPlanetAspectPivot");
+  if(aspPivotElem.value === "Birth") aspPivotElem.value = rotatoGetBirthDashaLord();
+  
+  // Enforce Position: Move wrapper to the very end of body dynamically
+  const container = document.getElementById("rotato-main-container");
+  if(container) {
+      document.body.appendChild(container);
+  }
+  
+  buildRotatoTables();
+}
+
+/* ================= HOOK INTO MAIN PROJECT'S buildAll() ================= */
+const preRotatoBuildAll = buildAll;
+buildAll = function() {
+  if(preRotatoBuildAll) preRotatoBuildAll();
+  setTimeout(initRotato, 100); 
+};
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+/* MATCH MAIN ROTATO THEME EXACTLY */
+#astrology-relation-wrapper {
+  margin-top: 60px;
+  margin-bottom: 60px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#astrology-relation-header {
+  text-align: center;
+  color: #d4af37;
+  font-size: 30px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+#astrology-relation-content {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease;
+}
+
+.astrology-relation-inner {
+  padding: 20px;
+  background: #020d0a; 
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  color: #e5e7eb;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.astrology-relation-inner h2 {
+  color: #10b981;
+  text-shadow: none;
+  border-bottom: 2px solid #10b981;
+  padding-bottom: 6px;
+  margin-top: 26px;
+  font-size: 26px !important; 
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.astrology-relation-inner select,
+.astrology-relation-inner button,
+.astrology-relation-inner input.note {
+  background: #020617;
+  color: #e5edff;
+  border: 1px solid #10b981;
+  padding: 6px 10px;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: none;
+}
+
+.astrology-relation-inner button:hover {
+  background: #064e3b;
+  cursor: pointer;
+}
+
+.astrology-relation-inner button.active {
+  background: #10b981;
+  color: #020617;
+  box-shadow: 0 0 10px rgba(16,185,129,.6);
+}
+
+.astrology-relation-inner input[type="checkbox"],
+.astrology-relation-inner input[type="radio"] {
+  accent-color: #10b981;
+  transform: scale(1.1);
+}
+
+/* ===============================
+   TABLES
+   =============================== */
+.astrology-relation-inner table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+  background: #021b16;
+}
+
+.astrology-relation-inner th {
+  background: #064e3b;
+  font-size: 16px;
+  font-weight: 900;
+  color: #facc15;
+  border: 1px solid rgba(16,185,129,.4);
+  padding: 10px 4px;
+}
+
+.astrology-relation-inner td {
+  border: 1px solid rgba(16,185,129,.4);
+  padding: 10px 4px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* ===============================
+   PLANET TABLE & "PLANET" COLUMN
+   =============================== */
+#planetTableContainer table {
+  table-layout: fixed;
+}
+
+#planetTableContainer th:nth-child(1),
+#planetTableContainer td:nth-child(1) {
+  background-color: #000000 !important;
+  color: #f59e0b !important; 
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+/* ===============================
+   DISTANCE MATRIX & "LORD" COLUMN
+   =============================== */
+#matrixTableContainer table {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 900px;
+}
+
+#matrixTableContainer th:nth-child(1),
+#matrixTableContainer td:nth-child(1) {
+  width: 50px;
+  font-weight: 900;
+}
+
+#matrixTableContainer th:nth-child(2),
+#matrixTableContainer td:nth-child(2) {
+  width: 100px;
+  background-color: #000000 !important;
+  color: #f59e0b !important; 
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+#matrixTableContainer th.planet-col,
+#matrixTableContainer td.planet-col-data {
+  width: calc((100% - 150px) / 9);
+  word-wrap: break-word;
+}
+
+/* ===============================
+   MATRIX HEADER ROW
+   =============================== */
+#relMatrixHeader th {
+  font-size: 20px !important; 
+  background: #1e3a8a !important; 
+  color: #ffffff !important;
+  padding: 14px 4px !important;
+}
+
+#relMatrixHeader th:nth-child(2) {
+  background-color: #000000 !important;
+  color: #f59e0b !important;
+}
+
+/* Note Rows & Gap Rows */
+.astrology-relation-inner .gap-row td {
+  border: none;
+  height: 16px;
+  background: transparent;
+}
+.astrology-relation-inner .note-row td {
+  background: #020b08;
+}
+.astrology-relation-inner .note {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  background: transparent;
+  color: #e5edff;
+  border: none;
+  font-size: 16px;
+}
+.astrology-relation-inner tr.note-row.bad-row td {
+  color: #fecaca !important;
+  background: linear-gradient(180deg,#3b0f14,#22070b) !important;
+}
+.astrology-relation-inner .bad-label {
+  color: #fecaca !important;
+  font-weight: 900 !important;
+}
+</style>
+
+<div id="astrology-relation-wrapper">
+  <h2 id="astrology-relation-header">PLANET POSITIONS & DISTANCE MATRIX ▼</h2>
+  
+  <div id="astrology-relation-content">
+    <div class="astrology-relation-inner">
+      
+      <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; font-weight: 900; margin-bottom: 10px;">
+        <label><input type="checkbox" id="relIgnoreDegrees"> Ignore Degrees</label>
+        <label><input type="radio" name="relHouseSys" value="KP" checked> KP</label>
+        <label><input type="radio" name="relHouseSys" value="Vedic"> Vedic</label>
+        <label><input type="radio" name="relHouseSys" value="Sign"> Sign-to-Sign</label>
+      </div>
+
+      <div id="planetTableContainer" style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Planet</th><th>Retro</th><th>Sign</th><th>Degree</th><th>Output</th>
+            </tr>
+          </thead>
+          <tbody id="relPlanetTable"></tbody>
+        </table>
+      </div>
+
+      <h2>Planetary Distance Matrix</h2>
+
+      <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; font-weight: 900; margin-bottom: 10px;">
+        Lagna:
+        <select id="relLagnaSelect"></select>
+        
+        <label style="margin-left:12px;">
+          <input type="checkbox" id="relLagnaBasedChk" checked> Lagna Based
+        </label>
+        <label style="margin-left:8px;">
+          <input type="checkbox" id="relMoonBasedChk"> Moon Based
+        </label>
+
+        <label style="color:#38bdf8; margin-left:12px;"><input type="checkbox" id="relRelativeMode"> Relative Mode</label>
+        <label style="color:#f472b6;"><input type="checkbox" id="relPlanetsRealBad" checked> Planets Real Bad</label>
+        <label style="color:#facc15;"><input type="checkbox" id="relGraceMarks" checked> Grace Marks (<=4 = 0)</label>
+      </div>
+
+      <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; font-weight: 900; margin-bottom: 14px;">
+        <div style="display:flex; gap:6px;">
+          <button id="relForce2Btn">2</button>
+          <button id="relForce3Btn">3</button>
+          <button id="relForce6Btn">6</button>
+          <button id="relForce12Btn">12</button>
+        </div>
+
+        <label style="color:#22c55e; margin-left:10px;"><input type="checkbox" id="relExclude2Benefic"> 2 Exclude Benefic</label>
+        <label style="color:#22c55e;"><input type="checkbox" id="relExclude3Benefic"> 3 Exclude Benefic</label>
+        <label style="color:#ef4444;"><input type="checkbox" id="relExclude6Malefic"> 6 Exclude Malefic</label>
+        <label style="color:#a855f7;"><input type="checkbox" id="relExcludeBadSet" checked> Exclude Bad Set</label>
+      </div>
+
+      <div id="matrixTableContainer" style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr id="relMatrixHeader">
+              <th>No</th>
+              <th>Lord</th>
+            </tr>
+          </thead>
+          <tbody id="relMatrixTable"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   COLLAPSIBLE HEADER LOGIC
+========================================================= */
+document.getElementById('astrology-relation-header').onclick = function() {
+  const content = document.getElementById('astrology-relation-content');
+  if (content.style.maxHeight && content.style.maxHeight !== "0px") {
+    content.style.maxHeight = null;
+  } else {
+    content.style.maxHeight = content.scrollHeight + 800 + "px";
+  }
+};
+
+function updateRelHeight() {
+  const content = document.getElementById('astrology-relation-content');
+  if (content.style.maxHeight && content.style.maxHeight !== "0px") {
+    content.style.maxHeight = content.scrollHeight + 800 + "px";
+  }
+}
+
+/* =========================================================
+   DEGREE FORMATTER (DD° MM')
+========================================================= */
+function relFormatDegree(val) {
+  if (val === "" || val == null) return "";
+  const num = Number(val);
+  if (isNaN(num)) return "";
+  const d = Math.floor(num);
+  let m = Math.round((num - d) * 60);
+  let fd = d;
+  if (m === 60) { fd += 1; m = 0; }
+  return `${fd}° ${m.toString().padStart(2, '0')}'`;
+}
+
+/* =========================================================
+   CORE LOGIC FOR MINI PROJECT
+========================================================= */
+const REL_SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const REL_ALL_PLANETS=["Lagna","Sun","Moo","Mar","Rah","Jup","Sat","Bud","Ket","Ven"];
+const REL_NON_RETRO_PLANETS = ["Sun","Moo","Lagna"];
+const REL_BASE_COL_PLANETS=["Ket","Ven","Sun","Moo","Mar","Rah","Jup","Sat","Bud"];
+let REL_CURRENT_COL_PLANETS = [...REL_BASE_COL_PLANETS];
+
+const REL_DISPLAY_NAMES={
+  Sun:"Surya", Moo:"Chandra", Mar:"Mangala", Rah:"Rahu", Jup:"Guru",
+  Sat:"Shani", Bud:"Budha", Ket:"Ketu", Ven:"Venus", Lagna:"Lagna"
+};
+
+const REL_NAKSHATRA_LORDS = [
+  "Ket","Ven","Sun","Moo","Mar","Rah","Jup","Sat","Bud",
+  "Ket","Ven","Sun","Moo","Mar","Rah","Jup","Sat","Bud",
+  "Ket","Ven","Sun","Moo","Mar","Rah","Jup","Sat","Bud"
+];
+
+function relGetStarLord(planet){
+  if(!relData[planet].sign) return null;
+  const deg = parseFloat(relData[planet].degree || 0);
+  const signIndex = REL_SIGNS.indexOf(relData[planet].sign);
+  if(signIndex < 0) return null;
+  const abs = signIndex * 30 + deg;
+  const nak = Math.floor(abs / (13 + 1/3)); 
+  return REL_NAKSHATRA_LORDS[nak];
+}
+
+const relData={};
+REL_ALL_PLANETS.forEach(p=>{
+  relData[p]={ sign:"", degree:"", out:"", retro:(p==="Rah"||p==="Ket") };
+});
+
+let relHouseSystem="KP";
+let relManualLagnaOverride = false;
+
+const REL_LAGNA_LORDS={
+Aries:["Mar","Ven","Bud","Moo","Sun","Bud","Ven","Mar","Jup","Sat","Sat","Jup"],
+Taurus:["Ven","Bud","Moo","Sun","Bud","Ven","Mar","Jup","Sat","Sat","Jup","Mar"],
+Gemini:["Bud","Moo","Sun","Bud","Ven","Mar","Jup","Sat","Sat","Jup","Mar","Ven"],
+Cancer:["Moo","Sun","Bud","Ven","Mar","Jup","Sat","Sat","Jup","Mar","Ven","Bud"],
+Leo:["Sun","Bud","Ven","Mar","Jup","Sat","Sat","Jup","Mar","Ven","Bud","Moo"],
+Virgo:["Bud","Ven","Mar","Jup","Sat","Sat","Jup","Mar","Ven","Bud","Moo","Sun"],
+Libra:["Ven","Mar","Jup","Sat","Sat","Jup","Mar","Ven","Bud","Moo","Sun","Bud"],
+Scorpio:["Mar","Jup","Sat","Sat","Jup","Mar","Ven","Bud","Moo","Sun","Bud","Ven"],
+Sagittarius:["Jup","Sat","Sat","Jup","Mar","Ven","Bud","Moo","Sun","Bud","Ven","Mar"],
+Capricorn:["Sat","Sat","Jup","Mar","Ven","Bud","Moo","Sun","Bud","Ven","Mar","Jup"],
+Aquarius:["Sat","Jup","Mar","Ven","Bud","Moo","Sun","Bud","Ven","Mar","Jup","Sat"],
+Pisces:["Jup","Mar","Ven","Bud","Moo","Sun","Bud","Ven","Mar","Jup","Sat","Sat"]
+};
+
+const relLagnaSelect = document.getElementById("relLagnaSelect");
+const relLagnaBasedChk = document.getElementById("relLagnaBasedChk");
+const relMoonBasedChk = document.getElementById("relMoonBasedChk");
+const relRelativeModeChk = document.getElementById("relRelativeMode");
+const relPlanetsRealBadChk = document.getElementById("relPlanetsRealBad");
+const relGraceMarksChk = document.getElementById("relGraceMarks");
+
+const relExclude2Benefic = document.getElementById("relExclude2Benefic");
+const relExclude3Benefic = document.getElementById("relExclude3Benefic");
+const relExclude6Malefic = document.getElementById("relExclude6Malefic");
+const relExcludeBadSet = document.getElementById("relExcludeBadSet");
+
+const relForce2Btn = document.getElementById("relForce2Btn");
+const relForce3Btn = document.getElementById("relForce3Btn");
+const relForce6Btn = document.getElementById("relForce6Btn");
+const relForce12Btn = document.getElementById("relForce12Btn");
+
+const relIgnoreDegreesChk = document.getElementById("relIgnoreDegrees");
+const relPlanetTable = document.getElementById("relPlanetTable");
+const relMatrixTable = document.getElementById("relMatrixTable");
+
+let relForce2 = false; let relForce3 = false; let relForce6 = false; let relForce12 = false;
+
+relForce2Btn.onclick = () => { relForce2 = !relForce2; relForce2Btn.classList.toggle("active", relForce2); relBuildMatrix(); };
+relForce3Btn.onclick = () => { relForce3 = !relForce3; relForce3Btn.classList.toggle("active", relForce3); relBuildMatrix(); };
+relForce6Btn.onclick = () => { relForce6 = !relForce6; relForce6Btn.classList.toggle("active", relForce6); relBuildMatrix(); };
+relForce12Btn.onclick = () => { relForce12 = !relForce12; relForce12Btn.classList.toggle("active", relForce12); relBuildMatrix(); };
+
+relLagnaBasedChk.onchange = () => { if(!relLagnaBasedChk.checked) relLagnaBasedChk.checked = true; relMoonBasedChk.checked = false; relBuildMatrix(); };
+relMoonBasedChk.onchange = () => { if(!relMoonBasedChk.checked) relMoonBasedChk.checked = true; relLagnaBasedChk.checked = false; relBuildMatrix(); };
+relRelativeModeChk.onchange = () => { relBuildMatrix(); };
+relPlanetsRealBadChk.onchange = () => { relBuildMatrix(); };
+relGraceMarksChk.onchange = () => { relBuildMatrix(); };
+
+relExclude2Benefic.onchange = () => { relBuildMatrix(); };
+relExclude3Benefic.onchange = () => { relBuildMatrix(); };
+relExclude6Malefic.onchange = () => { relBuildMatrix(); };
+relExcludeBadSet.onchange = () => { relBuildMatrix(); };
+
+REL_SIGNS.forEach(s=>relLagnaSelect.innerHTML+=`<option>${s}</option>`);
+
+function relAbsPos(p){
+  if(!relData[p].sign) return null;
+  const deg = relIgnoreDegreesChk.checked ? 0 : Number(relData[p].degree||0);
+  return REL_SIGNS.indexOf(relData[p].sign)*30+deg;
+}
+
+function relSignPos(p){
+  if(!relData[p].sign) return null;
+  return REL_SIGNS.indexOf(relData[p].sign);
+}
+
+function relGetEffectiveLagnaSign(){
+  if(!relData.Lagna.sign) return null;
+  const deg = Number(relData.Lagna.degree || 0);
+  let signIndex = REL_SIGNS.indexOf(relData.Lagna.sign);
+  if(typeof SHIFTED_LORDSHIP !== 'undefined' && SHIFTED_LORDSHIP && deg >= 15){
+    signIndex = (signIndex + 1) % 12;
+  }
+  return REL_SIGNS[signIndex];
+}
+
+function relCalcHouse(diff){
+  if(relHouseSystem==="Sign"){
+    let h = diff + 1;
+    if(h > 12) h -= 12;
+    return h;
+  }
+  let h = relHouseSystem==="Vedic"
+    ? Math.floor((diff + 15) / 30) + 1
+    : Math.floor(diff / 30) + 1;
+  if(h > 12) h -= 12;
+  return h;
+}
+
+function relGetMatrixHouse(rowPlanet, colPlanet){
+  // RELATIVE MODE
+  if(relRelativeModeChk?.checked) {
+    const oaStr = relData[rowPlanet]?.out;
+    const obStr = relData[colPlanet]?.out;
+    if(oaStr !== "" && obStr !== "") {
+      const oa = parseInt(oaStr, 10);
+      const ob = parseInt(obStr, 10);
+      if(!isNaN(oa) && !isNaN(ob)) {
+        let diff = relData[rowPlanet].retro ? oa - ob : ob - oa;
+        while(diff < 0) diff += 12;
+        return (diff % 12) + 1;
+      }
+    }
+    return null;
+  }
+
+  // FALLBACK: Traditional mode
+  if(relHouseSystem !== "Sign"){
+    const a = relAbsPos(rowPlanet);
+    const b = relAbsPos(colPlanet);
+    if(a != null && b != null){
+      let diff = relData[rowPlanet].retro ? a - b : b - a;
+      if(diff < 0) diff += 360;
+      return relCalcHouse(diff);
+    }
+  }
+  const sa = relSignPos(rowPlanet);
+  const sb = relSignPos(colPlanet);
+  if(sa == null || sb == null) return null;
+  let diff = relData[rowPlanet].retro ? sa - sb : sb - sa;
+  if(diff < 0) diff += 12;
+  return diff + 1;
+}
+
+function relRecalcOutputs(){
+ if(relHouseSystem === "Sign"){
+  const lagnaSign = relData.Lagna.sign ? REL_SIGNS.indexOf(relData.Lagna.sign) : null;
+  REL_ALL_PLANETS.forEach(p=>{
+    relData[p].out = "";
+    if(p === "Lagna"){ relData[p].out = 1; return; }
+    if(!relData[p].sign || lagnaSign == null) return;
+    let diff = relSignPos(p) - lagnaSign;
+    if(diff < 0) diff += 12;
+    relData[p].out = diff + 1;
+  });
+  return;
+ }
+ let lagnaAbs = relAbsPos("Lagna");
+ REL_ALL_PLANETS.forEach(p=>{
+   relData[p].out="";
+   if(p === "Lagna"){ relData[p].out = 1; return; }
+   if(!relData[p].sign || lagnaAbs == null) return;
+   let diff = relAbsPos(p) - lagnaAbs;
+   if(diff < 0) diff += 360;
+   relData[p].out = relCalcHouse(diff);
+ });
+}
+
+function relBuildPlanetTable(){
+  relPlanetTable.innerHTML="";
+  REL_ALL_PLANETS.forEach(p=>{
+    const degFmt = relFormatDegree(relData[p].degree);
+    relPlanetTable.innerHTML+=`
+    <tr>
+      <td>${REL_DISPLAY_NAMES[p]}</td>
+      <td>${REL_NON_RETRO_PLANETS.includes(p) ? "" : `<input type="checkbox" data-p="${p}" ${relData[p].retro?"checked":""}>`}</td>
+      <td>${relData[p].sign}</td>
+      <td>${degFmt}</td>
+      <td style="font-weight:900;">${relData[p].out||""}</td>
+    </tr>`;
+  });
+
+  relPlanetTable.querySelectorAll("input[type='checkbox']").forEach(chk=>{
+    chk.onchange=()=>{
+      const p = chk.dataset.p;
+      if(REL_NON_RETRO_PLANETS.includes(p)){
+        relData[p].retro = false; chk.checked = false; return;
+      }
+      relData[p].retro = chk.checked;
+      relBuildMatrix();
+    };
+  });
+  updateRelHeight();
+}
+
+function relNoteRow(isBad=false){
+  return `
+  <tr class="note-row ${isBad?'bad-row':''}">
+    <td class="${isBad?'bad-label':''}">${isBad?'BAD':''}</td>
+    <td></td>
+    ${REL_CURRENT_COL_PLANETS.map((_,i)=>`<td class="planet-col-data"><input class="note" data-idx="${i}"></td>`).join("")}
+  </tr>`;
+}
+
+function relIsBadHouseForPlanet(colPlanet, house){
+  // OVERRIDE FORCES
+  if(relForce2 && house === 2) return true;
+  if(relForce3 && house === 3) return true;
+  if(relForce6 && house === 6) return true;
+  if(relForce12 && house === 12) return true;
+
+  const isBenefic = ["Moo","Jup","Bud","Ven"].includes(colPlanet);
+  const isMalefic = ["Sun","Mar","Sat","Rah","Ket"].includes(colPlanet);
+  
+  // === EXCLUDE LOGIC ===
+  if(relExclude2Benefic?.checked && house === 2 && isBenefic) return false;
+  if(relExclude3Benefic?.checked && house === 3 && isBenefic) return false;
+  if(relExclude6Malefic?.checked && house === 6 && isMalefic) return false;
+
+  // === RELATIVE MODE ===
+  if(relRelativeModeChk?.checked) {
+      return [2, 6, 8, 12].includes(house);
+  }
+
+  // === PLANETS REAL BAD MODE (UPDATED RULES) ===
+  if(relPlanetsRealBadChk?.checked) {
+      if(colPlanet === "Sun") return [2,5,8,9,12].includes(house);
+      if(colPlanet === "Sat") return [1,2,5,8,9,12].includes(house);
+      if(colPlanet === "Mar") return [1,2,5,7,8,9,12].includes(house);
+      if(colPlanet === "Rah" || colPlanet === "Ket") return [1,2,5,8,9,12].includes(house);
+      if(isBenefic) return [3,6,8,12].includes(house);
+      return false; 
+  }
+
+  // === EXCLUDE BAD SET FIX ===
+  if(relExcludeBadSet?.checked) {
+      return [2, 6, 8, 12].includes(house);
+  }
+
+  // === TRADITIONAL ABSOLUTE MODE (Legacy) ===
+  const out = relData[colPlanet]?.out;
+  if(out == null) return false;
+
+  let badSet = [];
+  if(["Sun","Mar","Sat"].includes(colPlanet)){
+    if([3,6,10,11].includes(out)) badSet = [8];
+    else if([1,2,4,5,7,8,9,12].includes(out)) badSet = [2,6,8,12];
+  }
+  if(["Rah","Ket"].includes(colPlanet)){
+    if([2,3,6,7,9,11].includes(out)) badSet = [8];
+    else if([1,4,5,8,10,12].includes(out)) badSet = [2,6,8,12];
+  }
+  if(["Moo","Jup","Bud","Ven"].includes(colPlanet)){
+    if([1,2,4,5,7,9,10].includes(out)) badSet = [8];
+    else if([3,6,8,11,12].includes(out)) badSet = [2,6,8,12];
+  }
+  return badSet.includes(house);
+}
+
+function relCountBadHousesFromVisual(colPlanet){
+  let count = 0;
+  
+  const colIndex = REL_CURRENT_COL_PLANETS.indexOf(colPlanet);
+  if(colIndex === -1) return 0;
+  
+  const rows = relMatrixTable.querySelectorAll("tr:not(.note-row):not(.gap-row)");
+  rows.forEach(tr=>{
+    const tds = tr.querySelectorAll("td.planet-col-data");
+    if(tds.length <= colIndex) return;
+    const cell = tds[colIndex];
+    if(!cell) return;
+    const val = parseInt(cell.textContent.trim(), 10);
+    if(isNaN(val)) return;
+    
+    // Check if the house is considered bad for this specific planet
+    if(relIsBadHouseForPlanet(colPlanet, val)) {
+        count++;
+    }
+  });
+  
+  // === GRACE MARKS LOGIC FIX ===
+  // If the total bad count is 4 or less, it reduces entirely to zero.
+  if(relGraceMarksChk?.checked) {
+     if(count <= 4) {
+         return 0; 
+     }
+  }
+  
+  return count;
+}
+
+function relBuildMatrixHeader(){
+  const tr = document.getElementById("relMatrixHeader");
+  if(!tr) return;
+  tr.querySelectorAll("th.planet-col").forEach(th=>th.remove());
+  REL_CURRENT_COL_PLANETS.forEach(p=>{
+    const th = document.createElement("th");
+    th.className = "planet-col";
+    th.textContent = REL_DISPLAY_NAMES[p] || p;
+    tr.appendChild(th);
+  });
+}
+
+function relBuildMatrix(){
+  let pivotPlanet = null;
+  if(relLagnaBasedChk?.checked) pivotPlanet = relGetStarLord("Lagna");
+  if(relMoonBasedChk?.checked) pivotPlanet = relGetStarLord("Moo");
+
+  let COL_PLANETS;
+  if(pivotPlanet){
+    const idx = REL_BASE_COL_PLANETS.indexOf(pivotPlanet);
+    if(idx >= 0){
+      COL_PLANETS = [...REL_BASE_COL_PLANETS.slice(idx), ...REL_BASE_COL_PLANETS.slice(0, idx)];
+    } else {
+      COL_PLANETS = [...REL_BASE_COL_PLANETS];
+    }
+  } else {
+    COL_PLANETS = [...REL_BASE_COL_PLANETS];
+  }
+
+  REL_CURRENT_COL_PLANETS = [...COL_PLANETS];
+  relBuildMatrixHeader();
+  relMatrixTable.innerHTML = "";
+  relMatrixTable.innerHTML += relNoteRow(true);
+  relMatrixTable.innerHTML += `<tr class="gap-row"><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
+
+  const lagnaForMatrix = relManualLagnaOverride ? relLagnaSelect.value : relGetEffectiveLagnaSign();
+  const lords = REL_LAGNA_LORDS[lagnaForMatrix];
+
+  if(!lords){
+    relMatrixTable.innerHTML += `<tr><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
+    return;
+  }
+
+  lords.forEach((lord,i)=>{
+    const fullLordName = REL_DISPLAY_NAMES[lord] || lord;
+    relMatrixTable.innerHTML+=`
+    <tr>
+      <td style="font-weight:900;">${i+1}</td>
+      <td>${fullLordName}</td>
+      ${COL_PLANETS.map(col=>{
+        if(lord===col) return `<td class="planet-col-data">${relData[col].out||""}</td>`;
+        const h = relGetMatrixHouse(lord, col);
+        return `<td class="planet-col-data">${h ?? ""}</td>`;
+      }).join("")}
+    </tr>`;
+  });
+
+  relMatrixTable.innerHTML+=`<tr class="gap-row"><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
+
+  ["Rah","Ket"].forEach(r=>{
+    const fullNodeName = REL_DISPLAY_NAMES[r] || r;
+    relMatrixTable.innerHTML+=`
+    <tr>
+      <td style="font-weight:900;">${r === "Rah" ? 13 : 14}</td>
+      <td>${fullNodeName}</td>
+      ${COL_PLANETS.map(col=>{
+        if(r===col) return `<td class="planet-col-data">${relData[col].out||""}</td>`;
+        const h = relGetMatrixHouse(r, col);
+        return `<td class="planet-col-data">${h ?? ""}</td>`;
+      }).join("")}
+    </tr>`;
+  });
+
+  const badInputs = relMatrixTable.querySelectorAll('.note-row.bad-row .note');
+  badInputs.forEach((inp)=>{
+    const idx = parseInt(inp.dataset.idx, 10);
+    const colPlanet = REL_CURRENT_COL_PLANETS[idx];
+    if(!colPlanet) return;
+    inp.value = relCountBadHousesFromVisual(colPlanet);
+  });
+  
+  updateRelHeight();
+}
+
+relIgnoreDegreesChk.onchange=()=>{relRecalcOutputs();relBuildPlanetTable();relBuildMatrix();};
+relLagnaSelect.onchange=()=>{ relManualLagnaOverride = true; relBuildMatrix(); };
+
+function relSyncEffectiveLagnaDropdown(){
+  if(relManualLagnaOverride) return;
+  const eff = relGetEffectiveLagnaSign();
+  if(eff && relLagnaSelect.value !== eff){
+    relLagnaSelect.value = eff;
+  }
+}
+
+document.querySelectorAll('input[name="relHouseSys"]').forEach(r=>{
+  r.onchange=e=>{
+    relHouseSystem=e.target.value;
+    relRecalcOutputs();relBuildPlanetTable();relBuildMatrix();
+  };
+});
+
+/* ======================================================
+   CLOUD FETCHER INTEGRATION
+====================================================== */
+const REL_SWISS_PLANET_MAP = {
+  Surya: "Sun", Chandra: "Moo", Mangala: "Mar", Budha: "Bud",
+  Jupiter: "Jup", Saturn: "Sat", Venus: "Ven", Rahu: "Rah", Ketu: "Ket"
+};
+
+function relAbsToSignDeg(abs){
+  let a = abs % 360;
+  if(a < 0) a += 360;
+  const signIndex = Math.floor(a / 30);
+  const degree = +(a % 30).toFixed(4); 
+  return { sign: REL_SIGNS[signIndex], degree };
+}
+
+function updateMiniProjectFromCloud() {
+  const relContainer = document.getElementById("astrology-relation-wrapper");
+  if(relContainer) {
+      document.body.appendChild(relContainer);
+  }
+
+  if (typeof PLANETS === 'undefined' || typeof CUSPS === 'undefined') return;
+
+  REL_ALL_PLANETS.forEach(p => {
+    relData[p] = { sign: "", degree: "", out: "", retro: (p === "Rah" || p === "Ket") };
+  });
+
+  if (CUSPS[1] !== undefined) {
+    const l = relAbsToSignDeg(CUSPS[1]);
+    relData.Lagna.sign = l.sign;
+    relData.Lagna.degree = l.degree;
+  }
+
+  Object.keys(PLANETS).forEach(sp => {
+    const tp = REL_SWISS_PLANET_MAP[sp];
+    if (!tp) return;
+    const v = relAbsToSignDeg(PLANETS[sp]);
+    relData[tp].sign = v.sign;
+    relData[tp].degree = v.degree;
+  });
+
+  const lahiri = typeof DATA !== 'undefined' && DATA.ayanamshas ? DATA.ayanamshas["Lahiri"] : null;
+  if (lahiri && lahiri.planets_retro) {
+    Object.keys(lahiri.planets_retro).forEach(sp => {
+      const tp = REL_SWISS_PLANET_MAP[sp];
+      if (!tp) return;
+      if (REL_NON_RETRO_PLANETS.includes(tp)) {
+        relData[tp].retro = false;
+        return;
+      }
+      if (tp === "Rah" || tp === "Ket") {
+        relData[tp].retro = true;
+        return;
+      }
+      relData[tp].retro = !!lahiri.planets_retro[sp];
+    });
+  }
+
+  relIgnoreDegreesChk.checked = false;
+  relHouseSystem = "KP";
+  const kpRadio = document.querySelector('input[name="relHouseSys"][value="KP"]');
+  if (kpRadio) kpRadio.checked = true;
+
+  relManualLagnaOverride = false;
+  
+  relRecalcOutputs();
+  relSyncEffectiveLagnaDropdown();
+  relBuildPlanetTable();
+  relBuildMatrix();
+}
+
+const preRelationBuildAll = typeof buildAll === 'function' ? buildAll : null;
+buildAll = function() {
+  if (preRelationBuildAll) preRelationBuildAll();
+  setTimeout(updateMiniProjectFromCloud, 250);
+};
+
+relBuildPlanetTable();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
-</html>
+
+
 
 
 
