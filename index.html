@@ -5287,7 +5287,7 @@ buildAll = function() {
 
 
 
-
+<!-- PLANET POSITIONS & DISTANCE MATRIX Table -->
 
 
 <style>
@@ -5409,20 +5409,20 @@ buildAll = function() {
 /* ===============================
    DISTANCE MATRIX & "LORD" COLUMN
    =============================== */
-#matrixTableContainer table {
+.matrix-table-container table {
   table-layout: fixed;
   width: 100%;
   min-width: 900px;
 }
 
-#matrixTableContainer th:nth-child(1),
-#matrixTableContainer td:nth-child(1) {
+.matrix-table-container th:nth-child(1),
+.matrix-table-container td:nth-child(1) {
   width: 50px;
   font-weight: 900;
 }
 
-#matrixTableContainer th:nth-child(2),
-#matrixTableContainer td:nth-child(2) {
+.matrix-table-container th:nth-child(2),
+.matrix-table-container td:nth-child(2) {
   width: 100px;
   background-color: #000000 !important;
   color: #f59e0b !important; 
@@ -5430,8 +5430,8 @@ buildAll = function() {
   font-weight: 900 !important;
 }
 
-#matrixTableContainer th.planet-col,
-#matrixTableContainer td.planet-col-data {
+.matrix-table-container th.planet-col,
+.matrix-table-container td.planet-col-data {
   width: calc((100% - 150px) / 9);
   word-wrap: break-word;
 }
@@ -5439,14 +5439,14 @@ buildAll = function() {
 /* ===============================
    MATRIX HEADER ROW
    =============================== */
-#relMatrixHeader th {
+.rel-matrix-header th {
   font-size: 20px !important; 
   background: #1e3a8a !important; 
   color: #ffffff !important;
   padding: 14px 4px !important;
 }
 
-#relMatrixHeader th:nth-child(2) {
+.rel-matrix-header th:nth-child(2) {
   background-color: #000000 !important;
   color: #f59e0b !important;
 }
@@ -5496,7 +5496,7 @@ buildAll = function() {
         <table>
           <thead>
             <tr>
-              <th>Planet</th><th>Retro</th><th>Sign</th><th>Degree</th><th>Output</th>
+              <th>Planet</th><th>Retro</th><th>Sign</th><th>Degree</th><th>Output</th><th>Afflicted</th>
             </tr>
           </thead>
           <tbody id="relPlanetTable"></tbody>
@@ -5516,9 +5516,7 @@ buildAll = function() {
           <input type="checkbox" id="relMoonBasedChk"> Moon Based
         </label>
 
-        <label style="color:#38bdf8; margin-left:12px;"><input type="checkbox" id="relRelativeMode"> Relative Mode</label>
-        <label style="color:#f472b6;"><input type="checkbox" id="relPlanetsRealBad" checked> Planets Real Bad</label>
-        <label style="color:#facc15;"><input type="checkbox" id="relGraceMarks" checked> Grace Marks (<=4 = 0)</label>
+        <label style="color:#facc15; margin-left:12px;"><input type="checkbox" id="relGraceMarks" > Grace Marks (<=4 = 0)</label>
       </div>
 
       <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; font-weight: 900; margin-bottom: 14px;">
@@ -5532,18 +5530,49 @@ buildAll = function() {
         <label style="color:#22c55e; margin-left:10px;"><input type="checkbox" id="relExclude2Benefic"> 2 Exclude Benefic</label>
         <label style="color:#22c55e;"><input type="checkbox" id="relExclude3Benefic"> 3 Exclude Benefic</label>
         <label style="color:#ef4444;"><input type="checkbox" id="relExclude6Malefic"> 6 Exclude Malefic</label>
-        <label style="color:#a855f7;"><input type="checkbox" id="relExcludeBadSet" checked> Exclude Bad Set</label>
+        <label style="color:#a855f7;"><input type="checkbox" id="relExcludeBadSet"> Exclude Bad Set</label>
       </div>
 
-      <div id="matrixTableContainer" style="overflow-x: auto;">
+      <h3 style="color:#d4af37; margin-top:20px; font-weight:900;">Table A: Standard Matrix (Baseline 2, 6, 8, 12)</h3>
+      <div class="matrix-table-container" style="overflow-x: auto; margin-bottom: 30px;">
         <table>
           <thead>
-            <tr id="relMatrixHeader">
-              <th>No</th>
-              <th>Lord</th>
-            </tr>
+            <tr class="rel-matrix-header"><th>No</th><th>Lord</th></tr>
           </thead>
-          <tbody id="relMatrixTable"></tbody>
+          <tbody id="relMatrixTableA"></tbody>
+        </table>
+      </div>
+
+      <h3 style="color:#f472b6; margin-top:10px; font-weight:900;">Table B: Advanced Matrix (Real Bad Planets Mode)</h3>
+      <div class="matrix-table-container" style="overflow-x: auto; margin-bottom: 30px;">
+        <table>
+          <thead>
+            <tr class="rel-matrix-header"><th>No</th><th>Lord</th></tr>
+          </thead>
+          <tbody id="relMatrixTableB"></tbody>
+        </table>
+      </div>
+
+      <h3 style="color:#38bdf8; margin-top:10px; font-weight:900;">Table C: Relative Mode (Baseline 2, 6, 8, 12)</h3>
+      <div style="color:#94a3b8; font-size:14px; font-weight:600; margin-top:-4px; margin-bottom:14px; font-style:italic; line-height:1.4;">
+        *Note: Relative mode means considering a planet is in a particular house based strictly on its KP house placement, ignoring exact degrees. For example, if Saturn is in the 8th house and Budha is in the 9th, we relatively consider Budha to be in the 2nd house from Saturn without factoring in degree differences.
+      </div>
+      <div class="matrix-table-container" style="overflow-x: auto; margin-bottom: 30px;">
+        <table>
+          <thead>
+            <tr class="rel-matrix-header"><th>No</th><th>Lord</th></tr>
+          </thead>
+          <tbody id="relMatrixTableC"></tbody>
+        </table>
+      </div>
+
+      <h3 style="color:#a855f7; margin-top:10px; font-weight:900;">Table D: Relative Mode + Real Bad Planets</h3>
+      <div class="matrix-table-container" style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr class="rel-matrix-header"><th>No</th><th>Lord</th></tr>
+          </thead>
+          <tbody id="relMatrixTableD"></tbody>
         </table>
       </div>
 
@@ -5617,7 +5646,7 @@ function relGetStarLord(planet){
 
 const relData={};
 REL_ALL_PLANETS.forEach(p=>{
-  relData[p]={ sign:"", degree:"", out:"", retro:(p==="Rah"||p==="Ket") };
+  relData[p]={ sign:"", degree:"", out:"", retro:(p==="Rah"||p==="Ket"), afflicted: false };
 });
 
 let relHouseSystem="KP";
@@ -5641,8 +5670,6 @@ Pisces:["Jup","Mar","Ven","Bud","Moo","Sun","Bud","Ven","Mar","Jup","Sat","Sat"]
 const relLagnaSelect = document.getElementById("relLagnaSelect");
 const relLagnaBasedChk = document.getElementById("relLagnaBasedChk");
 const relMoonBasedChk = document.getElementById("relMoonBasedChk");
-const relRelativeModeChk = document.getElementById("relRelativeMode");
-const relPlanetsRealBadChk = document.getElementById("relPlanetsRealBad");
 const relGraceMarksChk = document.getElementById("relGraceMarks");
 
 const relExclude2Benefic = document.getElementById("relExclude2Benefic");
@@ -5657,7 +5684,10 @@ const relForce12Btn = document.getElementById("relForce12Btn");
 
 const relIgnoreDegreesChk = document.getElementById("relIgnoreDegrees");
 const relPlanetTable = document.getElementById("relPlanetTable");
-const relMatrixTable = document.getElementById("relMatrixTable");
+const relMatrixTableA = document.getElementById("relMatrixTableA");
+const relMatrixTableB = document.getElementById("relMatrixTableB");
+const relMatrixTableC = document.getElementById("relMatrixTableC");
+const relMatrixTableD = document.getElementById("relMatrixTableD");
 
 let relForce2 = false; let relForce3 = false; let relForce6 = false; let relForce12 = false;
 
@@ -5668,9 +5698,8 @@ relForce12Btn.onclick = () => { relForce12 = !relForce12; relForce12Btn.classLis
 
 relLagnaBasedChk.onchange = () => { if(!relLagnaBasedChk.checked) relLagnaBasedChk.checked = true; relMoonBasedChk.checked = false; relBuildMatrix(); };
 relMoonBasedChk.onchange = () => { if(!relMoonBasedChk.checked) relMoonBasedChk.checked = true; relLagnaBasedChk.checked = false; relBuildMatrix(); };
-relRelativeModeChk.onchange = () => { relBuildMatrix(); };
-relPlanetsRealBadChk.onchange = () => { relBuildMatrix(); };
 relGraceMarksChk.onchange = () => { relBuildMatrix(); };
+
 
 relExclude2Benefic.onchange = () => { relBuildMatrix(); };
 relExclude3Benefic.onchange = () => { relBuildMatrix(); };
@@ -5713,9 +5742,8 @@ function relCalcHouse(diff){
   return h;
 }
 
-function relGetMatrixHouse(rowPlanet, colPlanet){
-  // RELATIVE MODE
-  if(relRelativeModeChk?.checked) {
+function relGetMatrixHouse(rowPlanet, colPlanet, isRelativeMode){
+  if(isRelativeMode) {
     const oaStr = relData[rowPlanet]?.out;
     const obStr = relData[colPlanet]?.out;
     if(oaStr !== "" && obStr !== "") {
@@ -5776,17 +5804,40 @@ function relBuildPlanetTable(){
   relPlanetTable.innerHTML="";
   REL_ALL_PLANETS.forEach(p=>{
     const degFmt = relFormatDegree(relData[p].degree);
+    
+    // Check if the planet is naturally in a "Worst" placement based on its output house
+        let naturallyBad = false;
+        const outVal = parseInt(relData[p].out, 10);
+        if (!isNaN(outVal)) {
+          if (["Sun","Mar","Sat"].includes(p) && [1,5,8,12].includes(outVal)) naturallyBad = true;
+          else if (["Rah","Ket"].includes(p) && [1,4,5,8,10,12].includes(outVal)) naturallyBad = true;
+          else if (["Moo","Jup","Bud","Ven"].includes(p) && [3,6,8,12].includes(outVal)) naturallyBad = true;
+        }
+
+        if (relData[p].autoAfflictSet !== relData[p].out) {
+            relData[p].afflicted = naturallyBad;
+            relData[p].autoAfflictSet = relData[p].out;
+        }
+
+        const statusHtml = naturallyBad 
+            ? `<span style="color:#ef4444; font-size:12px; font-weight:800; display:block;">Rules: BAD</span>` 
+            : `<span style="color:#22c55e; font-size:12px; font-weight:800; display:block;">Rules: GOOD</span>`;
+
     relPlanetTable.innerHTML+=`
     <tr>
       <td>${REL_DISPLAY_NAMES[p]}</td>
-      <td>${REL_NON_RETRO_PLANETS.includes(p) ? "" : `<input type="checkbox" data-p="${p}" ${relData[p].retro?"checked":""}>`}</td>
+      <td>${REL_NON_RETRO_PLANETS.includes(p) ? "" : `<input type="checkbox" class="retro-chk" data-p="${p}" ${relData[p].retro?"checked":""}>`}</td>
       <td>${relData[p].sign}</td>
       <td>${degFmt}</td>
       <td style="font-weight:900;">${relData[p].out||""}</td>
+      <td style="${naturallyBad ? 'background:rgba(239,68,68,0.15);' : ''}">
+        <input type="checkbox" class="afflict-chk" data-p="${p}" ${relData[p].afflicted?"checked":""}>
+        ${relData[p].out !== "" ? statusHtml : ""}
+      </td>
     </tr>`;
   });
 
-  relPlanetTable.querySelectorAll("input[type='checkbox']").forEach(chk=>{
+  relPlanetTable.querySelectorAll(".retro-chk").forEach(chk=>{
     chk.onchange=()=>{
       const p = chk.dataset.p;
       if(REL_NON_RETRO_PLANETS.includes(p)){
@@ -5796,6 +5847,15 @@ function relBuildPlanetTable(){
       relBuildMatrix();
     };
   });
+  
+  relPlanetTable.querySelectorAll(".afflict-chk").forEach(chk=>{
+    chk.onchange=()=>{
+      const p = chk.dataset.p;
+      relData[p].afflicted = chk.checked;
+      relBuildMatrix(); // Re-render tables with forced bad placement
+    };
+  });
+  
   updateRelHeight();
 }
 
@@ -5808,8 +5868,7 @@ function relNoteRow(isBad=false){
   </tr>`;
 }
 
-function relIsBadHouseForPlanet(colPlanet, house){
-  // OVERRIDE FORCES
+function relIsBadHouseForPlanet(colPlanet, house, isRelativeMode, isRealBadMode){
   if(relForce2 && house === 2) return true;
   if(relForce3 && house === 3) return true;
   if(relForce6 && house === 6) return true;
@@ -5818,58 +5877,64 @@ function relIsBadHouseForPlanet(colPlanet, house){
   const isBenefic = ["Moo","Jup","Bud","Ven"].includes(colPlanet);
   const isMalefic = ["Sun","Mar","Sat","Rah","Ket"].includes(colPlanet);
   
-  // === EXCLUDE LOGIC ===
   if(relExclude2Benefic?.checked && house === 2 && isBenefic) return false;
   if(relExclude3Benefic?.checked && house === 3 && isBenefic) return false;
   if(relExclude6Malefic?.checked && house === 6 && isMalefic) return false;
 
-  // === RELATIVE MODE ===
-  if(relRelativeModeChk?.checked) {
-      return [2, 6, 8, 12].includes(house);
-  }
-
-  // === PLANETS REAL BAD MODE (UPDATED RULES) ===
-  if(relPlanetsRealBadChk?.checked) {
-      if(colPlanet === "Sun") return [2,5,8,9,12].includes(house);
-      if(colPlanet === "Sat") return [1,2,5,8,9,12].includes(house);
-      if(colPlanet === "Mar") return [1,2,5,7,8,9,12].includes(house);
-      if(colPlanet === "Rah" || colPlanet === "Ket") return [1,2,5,8,9,12].includes(house);
-      if(isBenefic) return [3,6,8,12].includes(house);
-      return false; 
-  }
-
-  // === EXCLUDE BAD SET FIX ===
-  if(relExcludeBadSet?.checked) {
-      return [2, 6, 8, 12].includes(house);
-  }
-
-  // === TRADITIONAL ABSOLUTE MODE (Legacy) ===
   const out = relData[colPlanet]?.out;
-  if(out == null) return false;
+  if (out == null) return false;
+
+  let worstSet = [];
+
+  // Define the "Worst" case penalty based on the Table Mode
+  if (isRealBadMode) {
+      if (colPlanet === "Sun") worstSet = [2,5,8,9,12];
+      else if (colPlanet === "Sat") worstSet = [1,2,5,8,9,12];
+      else if (colPlanet === "Mar") worstSet = [1,2,5,7,8,9,12];
+      else if (["Rah","Ket"].includes(colPlanet)) worstSet = [1,5,8,9,12];
+      else if (isBenefic) worstSet = [3,6,8,12];
+  } else {
+      // Standard Baseline Mode for Tables A & C
+      worstSet = [2,6,8,12]; 
+  }
 
   let badSet = [];
-  if(["Sun","Mar","Sat"].includes(colPlanet)){
-    if([3,6,10,11].includes(out)) badSet = [8];
-    else if([1,2,4,5,7,8,9,12].includes(out)) badSet = [2,6,8,12];
+  const isAfflicted = relData[colPlanet]?.afflicted;
+
+  if (isAfflicted) {
+      // Manual Override: Force the planet to act as a bad placement
+      badSet = worstSet;
+  } 
+  else {
+      // 1. MALEFIC PLANETS
+      if (["Sun","Mar","Sat"].includes(colPlanet)) {
+        if ([2,3,4,6,7,9,10,11].includes(out)) badSet = [8];
+        else if ([1,5,8,12].includes(out)) badSet = worstSet;
+      }
+      
+      // 2. RAHU & KETU 
+      else if (["Rah","Ket"].includes(colPlanet)) {
+        if ([2,3,6,7,9,11].includes(out)) badSet = [8];
+        else if ([1,4,5,8,10,12].includes(out)) badSet = worstSet;
+      }
+      
+      // 3. BENEFIC PLANETS
+      else if (isBenefic) {
+        if ([1,2,4,5,7,9,10,11].includes(out)) badSet = [8];
+        else if ([3,6,8,12].includes(out)) badSet = worstSet;
+      }
   }
-  if(["Rah","Ket"].includes(colPlanet)){
-    if([2,3,6,7,9,11].includes(out)) badSet = [8];
-    else if([1,4,5,8,10,12].includes(out)) badSet = [2,6,8,12];
-  }
-  if(["Moo","Jup","Bud","Ven"].includes(colPlanet)){
-    if([1,2,4,5,7,9,10].includes(out)) badSet = [8];
-    else if([3,6,8,11,12].includes(out)) badSet = [2,6,8,12];
-  }
+  
   return badSet.includes(house);
 }
 
-function relCountBadHousesFromVisual(colPlanet){
+function relCountBadHousesFromVisual(colPlanet, tbodyElem, isRelativeMode, isRealBadMode){
   let count = 0;
   
   const colIndex = REL_CURRENT_COL_PLANETS.indexOf(colPlanet);
   if(colIndex === -1) return 0;
   
-  const rows = relMatrixTable.querySelectorAll("tr:not(.note-row):not(.gap-row)");
+  const rows = tbodyElem.querySelectorAll("tr:not(.note-row):not(.gap-row)");
   rows.forEach(tr=>{
     const tds = tr.querySelectorAll("td.planet-col-data");
     if(tds.length <= colIndex) return;
@@ -5878,14 +5943,11 @@ function relCountBadHousesFromVisual(colPlanet){
     const val = parseInt(cell.textContent.trim(), 10);
     if(isNaN(val)) return;
     
-    // Check if the house is considered bad for this specific planet
-    if(relIsBadHouseForPlanet(colPlanet, val)) {
+    if(relIsBadHouseForPlanet(colPlanet, val, isRelativeMode, isRealBadMode)) {
         count++;
     }
   });
   
-  // === GRACE MARKS LOGIC FIX ===
-  // If the total bad count is 4 or less, it reduces entirely to zero.
   if(relGraceMarksChk?.checked) {
      if(count <= 4) {
          return 0; 
@@ -5896,15 +5958,56 @@ function relCountBadHousesFromVisual(colPlanet){
 }
 
 function relBuildMatrixHeader(){
-  const tr = document.getElementById("relMatrixHeader");
-  if(!tr) return;
-  tr.querySelectorAll("th.planet-col").forEach(th=>th.remove());
-  REL_CURRENT_COL_PLANETS.forEach(p=>{
-    const th = document.createElement("th");
-    th.className = "planet-col";
-    th.textContent = REL_DISPLAY_NAMES[p] || p;
-    tr.appendChild(th);
+  document.querySelectorAll(".rel-matrix-header").forEach(tr => {
+    tr.querySelectorAll("th.planet-col").forEach(th=>th.remove());
+    REL_CURRENT_COL_PLANETS.forEach(p=>{
+      const th = document.createElement("th");
+      th.className = "planet-col";
+      th.textContent = REL_DISPLAY_NAMES[p] || p;
+      tr.appendChild(th);
+    });
   });
+}
+
+function relBuildSingleMatrixHTML(COL_PLANETS, lords, isRelativeMode) {
+  if(!lords) return `<tr><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
+  
+  let html = relNoteRow(true);
+  html += `<tr class="gap-row"><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
+
+  lords.forEach((lord,i)=>{
+    const fullLordName = REL_DISPLAY_NAMES[lord] || lord;
+    html += `
+    <tr>
+      <td style="font-weight:900;">${i+1}</td>
+      <td>${fullLordName}</td>
+      ${COL_PLANETS.map(col=>{
+        if(lord===col && !isRelativeMode) return `<td class="planet-col-data">${relData[col].out||""}</td>`;
+        if(lord===col && isRelativeMode) return `<td class="planet-col-data">1</td>`;
+        const h = relGetMatrixHouse(lord, col, isRelativeMode);
+        return `<td class="planet-col-data">${h ?? ""}</td>`;
+      }).join("")}
+    </tr>`;
+  });
+
+  html += `<tr class="gap-row"><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
+
+  ["Rah","Ket"].forEach(r=>{
+    const fullNodeName = REL_DISPLAY_NAMES[r] || r;
+    html += `
+    <tr>
+      <td style="font-weight:900;">${r === "Rah" ? 13 : 14}</td>
+      <td>${fullNodeName}</td>
+      ${COL_PLANETS.map(col=>{
+        if(r===col && !isRelativeMode) return `<td class="planet-col-data">${relData[col].out||""}</td>`;
+        if(r===col && isRelativeMode) return `<td class="planet-col-data">1</td>`;
+        const h = relGetMatrixHouse(r, col, isRelativeMode);
+        return `<td class="planet-col-data">${h ?? ""}</td>`;
+      }).join("")}
+    </tr>`;
+  });
+
+  return html;
 }
 
 function relBuildMatrix(){
@@ -5926,54 +6029,29 @@ function relBuildMatrix(){
 
   REL_CURRENT_COL_PLANETS = [...COL_PLANETS];
   relBuildMatrixHeader();
-  relMatrixTable.innerHTML = "";
-  relMatrixTable.innerHTML += relNoteRow(true);
-  relMatrixTable.innerHTML += `<tr class="gap-row"><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
 
   const lagnaForMatrix = relManualLagnaOverride ? relLagnaSelect.value : relGetEffectiveLagnaSign();
   const lords = REL_LAGNA_LORDS[lagnaForMatrix];
 
-  if(!lords){
-    relMatrixTable.innerHTML += `<tr><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
-    return;
-  }
+  const htmlStandard = relBuildSingleMatrixHTML(COL_PLANETS, lords, false);
+  const htmlRelative = relBuildSingleMatrixHTML(COL_PLANETS, lords, true);
 
-  lords.forEach((lord,i)=>{
-    const fullLordName = REL_DISPLAY_NAMES[lord] || lord;
-    relMatrixTable.innerHTML+=`
-    <tr>
-      <td style="font-weight:900;">${i+1}</td>
-      <td>${fullLordName}</td>
-      ${COL_PLANETS.map(col=>{
-        if(lord===col) return `<td class="planet-col-data">${relData[col].out||""}</td>`;
-        const h = relGetMatrixHouse(lord, col);
-        return `<td class="planet-col-data">${h ?? ""}</td>`;
-      }).join("")}
-    </tr>`;
-  });
+  const configs = [
+    { elem: relMatrixTableA, html: htmlStandard, isRel: false, isBad: false },
+    { elem: relMatrixTableB, html: htmlStandard, isRel: false, isBad: true },
+    { elem: relMatrixTableC, html: htmlRelative, isRel: true, isBad: false },
+    { elem: relMatrixTableD, html: htmlRelative, isRel: true, isBad: true }
+  ];
 
-  relMatrixTable.innerHTML+=`<tr class="gap-row"><td colspan="${REL_CURRENT_COL_PLANETS.length + 2}"></td></tr>`;
-
-  ["Rah","Ket"].forEach(r=>{
-    const fullNodeName = REL_DISPLAY_NAMES[r] || r;
-    relMatrixTable.innerHTML+=`
-    <tr>
-      <td style="font-weight:900;">${r === "Rah" ? 13 : 14}</td>
-      <td>${fullNodeName}</td>
-      ${COL_PLANETS.map(col=>{
-        if(r===col) return `<td class="planet-col-data">${relData[col].out||""}</td>`;
-        const h = relGetMatrixHouse(r, col);
-        return `<td class="planet-col-data">${h ?? ""}</td>`;
-      }).join("")}
-    </tr>`;
-  });
-
-  const badInputs = relMatrixTable.querySelectorAll('.note-row.bad-row .note');
-  badInputs.forEach((inp)=>{
-    const idx = parseInt(inp.dataset.idx, 10);
-    const colPlanet = REL_CURRENT_COL_PLANETS[idx];
-    if(!colPlanet) return;
-    inp.value = relCountBadHousesFromVisual(colPlanet);
+  configs.forEach(conf => {
+      conf.elem.innerHTML = conf.html;
+      const badInputs = conf.elem.querySelectorAll('.note-row.bad-row .note');
+      badInputs.forEach((inp)=>{
+        const idx = parseInt(inp.dataset.idx, 10);
+        const colPlanet = REL_CURRENT_COL_PLANETS[idx];
+        if(!colPlanet) return;
+        inp.value = relCountBadHousesFromVisual(colPlanet, conf.elem, conf.isRel, conf.isBad);
+      });
   });
   
   updateRelHeight();
@@ -6022,7 +6100,7 @@ function updateMiniProjectFromCloud() {
   if (typeof PLANETS === 'undefined' || typeof CUSPS === 'undefined') return;
 
   REL_ALL_PLANETS.forEach(p => {
-    relData[p] = { sign: "", degree: "", out: "", retro: (p === "Rah" || p === "Ket") };
+    relData[p] = { sign: "", degree: "", out: "", retro: (p === "Rah" || p === "Ket"), afflicted: false };
   });
 
   if (CUSPS[1] !== undefined) {
@@ -6078,7 +6156,7 @@ buildAll = function() {
 relBuildPlanetTable();
 </script>
 
-
+<!-- PLANET POSITIONS & DISTANCE MATRIX Table -->
 
 
 
